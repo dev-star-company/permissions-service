@@ -1,0 +1,25 @@
+package first_login_controller
+
+import (
+	"context"
+	"permission-service/generated_protos/first_login_proto"
+	"permission-service/internal/app/ent"
+	"permission-service/internal/app/ent/firstlogin"
+	"permission-service/internal/pkg/errs"
+)
+
+func (c *controller) Get(ctx context.Context, in *first_login_proto.GetRequest) (*first_login_proto.GetResponse, error) {
+	first_login, err := c.Db.FirstLogin.
+		Query().
+		Where(firstlogin.ID(int(in.Id))).
+		Only(ctx)
+
+	if ent.IsNotFound(err) {
+		return nil, errs.FirstLoginNotFound(int(in.Id))
+	}
+
+	return &first_login_proto.GetResponse{
+		RequesterId: uint32(first_login.CreatedBy),
+		UserId:      uint32(*first_login.UserID),
+	}, nil
+}

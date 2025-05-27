@@ -1,0 +1,4 @@
+permission-service/internal/app/ent/*
+!permission-service/internal/app/ent/schema/
+!permission-service/internal/app/ent/generate.go
+!permission-service/internal/app/ent/internal

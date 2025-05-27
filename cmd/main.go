@@ -2,6 +2,7 @@ package main
 
 import (
 	"permission-service/internal/app"
+	_ "permission-service/internal/app/ent/runtime"
 	"permission-service/internal/config/env"
 )
 

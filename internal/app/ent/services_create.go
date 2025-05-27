@@ -117,7 +117,9 @@ func (sc *ServicesCreate) Mutation() *ServicesMutation {
 
 // Save creates the Services in the database.
 func (sc *ServicesCreate) Save(ctx context.Context) (*Services, error) {
-	sc.defaults()
+	if err := sc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
@@ -144,15 +146,22 @@ func (sc *ServicesCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (sc *ServicesCreate) defaults() {
+func (sc *ServicesCreate) defaults() error {
 	if _, ok := sc.mutation.CreatedAt(); !ok {
+		if services.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized services.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := services.DefaultCreatedAt()
 		sc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := sc.mutation.UpdatedAt(); !ok {
+		if services.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized services.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := services.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

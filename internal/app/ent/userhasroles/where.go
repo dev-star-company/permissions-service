@@ -10,6 +10,51 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
+// ID filters vertices based on their ID field.
+func ID(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldEQ(FieldID, id))
+}
+
+// IDEQ applies the EQ predicate on the ID field.
+func IDEQ(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldEQ(FieldID, id))
+}
+
+// IDNEQ applies the NEQ predicate on the ID field.
+func IDNEQ(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldNEQ(FieldID, id))
+}
+
+// IDIn applies the In predicate on the ID field.
+func IDIn(ids ...int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldIn(FieldID, ids...))
+}
+
+// IDNotIn applies the NotIn predicate on the ID field.
+func IDNotIn(ids ...int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldNotIn(FieldID, ids...))
+}
+
+// IDGT applies the GT predicate on the ID field.
+func IDGT(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldGT(FieldID, id))
+}
+
+// IDGTE applies the GTE predicate on the ID field.
+func IDGTE(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldGTE(FieldID, id))
+}
+
+// IDLT applies the LT predicate on the ID field.
+func IDLT(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldLT(FieldID, id))
+}
+
+// IDLTE applies the LTE predicate on the ID field.
+func IDLTE(id int) predicate.UserHasRoles {
+	return predicate.UserHasRoles(sql.FieldLTE(FieldID, id))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.UserHasRoles {
 	return predicate.UserHasRoles(sql.FieldEQ(FieldCreatedAt, v))
@@ -354,7 +399,7 @@ func RoleIDNotIn(vs ...int) predicate.UserHasRoles {
 func HasUsers() predicate.UserHasRoles {
 	return predicate.UserHasRoles(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, UsersColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, UsersTable, UsersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -377,7 +422,7 @@ func HasUsersWith(preds ...predicate.User) predicate.UserHasRoles {
 func HasRoles() predicate.UserHasRoles {
 	return predicate.UserHasRoles(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, RolesColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, RolesTable, RolesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

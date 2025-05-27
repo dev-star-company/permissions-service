@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"permission-service/internal/app/ent/permission"
 	"permission-service/internal/app/ent/role"
+	"permission-service/internal/app/ent/rolehaspermissions"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -150,6 +151,21 @@ func (pc *PermissionCreate) AddRoles(r ...*Role) *PermissionCreate {
 	return pc.AddRoleIDs(ids...)
 }
 
+// AddRoleHasPermissionIDs adds the "role_has_permissions" edge to the RoleHasPermissions entity by IDs.
+func (pc *PermissionCreate) AddRoleHasPermissionIDs(ids ...int) *PermissionCreate {
+	pc.mutation.AddRoleHasPermissionIDs(ids...)
+	return pc
+}
+
+// AddRoleHasPermissions adds the "role_has_permissions" edges to the RoleHasPermissions entity.
+func (pc *PermissionCreate) AddRoleHasPermissions(r ...*RoleHasPermissions) *PermissionCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pc.AddRoleHasPermissionIDs(ids...)
+}
+
 // Mutation returns the PermissionMutation object of the builder.
 func (pc *PermissionCreate) Mutation() *PermissionMutation {
 	return pc.mutation
@@ -157,7 +173,9 @@ func (pc *PermissionCreate) Mutation() *PermissionMutation {
 
 // Save creates the Permission in the database.
 func (pc *PermissionCreate) Save(ctx context.Context) (*Permission, error) {
-	pc.defaults()
+	if err := pc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
@@ -184,12 +202,18 @@ func (pc *PermissionCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pc *PermissionCreate) defaults() {
+func (pc *PermissionCreate) defaults() error {
 	if _, ok := pc.mutation.CreatedAt(); !ok {
+		if permission.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized permission.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := permission.DefaultCreatedAt()
 		pc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		if permission.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized permission.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := permission.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
@@ -197,6 +221,7 @@ func (pc *PermissionCreate) defaults() {
 		v := permission.DefaultIsActive
 		pc.mutation.SetIsActive(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -335,9 +360,25 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RoleHasPermissionsCreate{config: pc.config, mutation: newRoleHasPermissionsMutation(pc.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.RoleHasPermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

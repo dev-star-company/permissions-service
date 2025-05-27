@@ -17,6 +17,8 @@ import (
 // UserHasRoles is the model entity for the UserHasRoles schema.
 type UserHasRoles struct {
 	config `json:"-"`
+	// ID of the ent.
+	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -77,7 +79,7 @@ func (*UserHasRoles) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case userhasroles.FieldCreatedBy, userhasroles.FieldUpdatedBy, userhasroles.FieldDeletedBy, userhasroles.FieldUserID, userhasroles.FieldRoleID:
+		case userhasroles.FieldID, userhasroles.FieldCreatedBy, userhasroles.FieldUpdatedBy, userhasroles.FieldDeletedBy, userhasroles.FieldUserID, userhasroles.FieldRoleID:
 			values[i] = new(sql.NullInt64)
 		case userhasroles.FieldCreatedAt, userhasroles.FieldUpdatedAt, userhasroles.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -96,6 +98,12 @@ func (uhr *UserHasRoles) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
+		case userhasroles.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			uhr.ID = int(value.Int64)
 		case userhasroles.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -191,6 +199,7 @@ func (uhr *UserHasRoles) Unwrap() *UserHasRoles {
 func (uhr *UserHasRoles) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserHasRoles(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", uhr.ID))
 	builder.WriteString("created_at=")
 	builder.WriteString(uhr.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")

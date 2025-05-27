@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // UserHasRolesQuery is the builder for querying UserHasRoles entities.
@@ -73,7 +74,7 @@ func (uhrq *UserHasRolesQuery) QueryUsers() *UserQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(userhasroles.Table, userhasroles.UsersColumn, selector),
+			sqlgraph.From(userhasroles.Table, userhasroles.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, userhasroles.UsersTable, userhasroles.UsersColumn),
 		)
@@ -95,7 +96,7 @@ func (uhrq *UserHasRolesQuery) QueryRoles() *RoleQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(userhasroles.Table, userhasroles.RolesColumn, selector),
+			sqlgraph.From(userhasroles.Table, userhasroles.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, userhasroles.RolesTable, userhasroles.RolesColumn),
 		)
@@ -127,6 +128,29 @@ func (uhrq *UserHasRolesQuery) FirstX(ctx context.Context) *UserHasRoles {
 	return node
 }
 
+// FirstID returns the first UserHasRoles ID from the query.
+// Returns a *NotFoundError when no UserHasRoles ID was found.
+func (uhrq *UserHasRolesQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = uhrq.Limit(1).IDs(setContextOp(ctx, uhrq.ctx, ent.OpQueryFirstID)); err != nil {
+		return
+	}
+	if len(ids) == 0 {
+		err = &NotFoundError{userhasroles.Label}
+		return
+	}
+	return ids[0], nil
+}
+
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (uhrq *UserHasRolesQuery) FirstIDX(ctx context.Context) int {
+	id, err := uhrq.FirstID(ctx)
+	if err != nil && !IsNotFound(err) {
+		panic(err)
+	}
+	return id
+}
+
 // Only returns a single UserHasRoles entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one UserHasRoles entity is found.
 // Returns a *NotFoundError when no UserHasRoles entities are found.
@@ -154,6 +178,34 @@ func (uhrq *UserHasRolesQuery) OnlyX(ctx context.Context) *UserHasRoles {
 	return node
 }
 
+// OnlyID is like Only, but returns the only UserHasRoles ID in the query.
+// Returns a *NotSingularError when more than one UserHasRoles ID is found.
+// Returns a *NotFoundError when no entities are found.
+func (uhrq *UserHasRolesQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = uhrq.Limit(2).IDs(setContextOp(ctx, uhrq.ctx, ent.OpQueryOnlyID)); err != nil {
+		return
+	}
+	switch len(ids) {
+	case 1:
+		id = ids[0]
+	case 0:
+		err = &NotFoundError{userhasroles.Label}
+	default:
+		err = &NotSingularError{userhasroles.Label}
+	}
+	return
+}
+
+// OnlyIDX is like OnlyID, but panics if an error occurs.
+func (uhrq *UserHasRolesQuery) OnlyIDX(ctx context.Context) int {
+	id, err := uhrq.OnlyID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // All executes the query and returns a list of UserHasRolesSlice.
 func (uhrq *UserHasRolesQuery) All(ctx context.Context) ([]*UserHasRoles, error) {
 	ctx = setContextOp(ctx, uhrq.ctx, ent.OpQueryAll)
@@ -171,6 +223,27 @@ func (uhrq *UserHasRolesQuery) AllX(ctx context.Context) []*UserHasRoles {
 		panic(err)
 	}
 	return nodes
+}
+
+// IDs executes the query and returns a list of UserHasRoles IDs.
+func (uhrq *UserHasRolesQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if uhrq.ctx.Unique == nil && uhrq.path != nil {
+		uhrq.Unique(true)
+	}
+	ctx = setContextOp(ctx, uhrq.ctx, ent.OpQueryIDs)
+	if err = uhrq.Select(userhasroles.FieldID).Scan(ctx, &ids); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
+// IDsX is like IDs, but panics if an error occurs.
+func (uhrq *UserHasRolesQuery) IDsX(ctx context.Context) []int {
+	ids, err := uhrq.IDs(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return ids
 }
 
 // Count returns the count of the given query.
@@ -194,7 +267,7 @@ func (uhrq *UserHasRolesQuery) CountX(ctx context.Context) int {
 // Exist returns true if the query has elements in the graph.
 func (uhrq *UserHasRolesQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, uhrq.ctx, ent.OpQueryExist)
-	switch _, err := uhrq.First(ctx); {
+	switch _, err := uhrq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -432,13 +505,15 @@ func (uhrq *UserHasRolesQuery) loadRoles(ctx context.Context, query *RoleQuery, 
 
 func (uhrq *UserHasRolesQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := uhrq.querySpec()
-	_spec.Unique = false
-	_spec.Node.Columns = nil
+	_spec.Node.Columns = uhrq.ctx.Fields
+	if len(uhrq.ctx.Fields) > 0 {
+		_spec.Unique = uhrq.ctx.Unique != nil && *uhrq.ctx.Unique
+	}
 	return sqlgraph.CountNodes(ctx, uhrq.driver, _spec)
 }
 
 func (uhrq *UserHasRolesQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(userhasroles.Table, userhasroles.Columns, nil)
+	_spec := sqlgraph.NewQuerySpec(userhasroles.Table, userhasroles.Columns, sqlgraph.NewFieldSpec(userhasroles.FieldID, field.TypeInt))
 	_spec.From = uhrq.sql
 	if unique := uhrq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -447,8 +522,11 @@ func (uhrq *UserHasRolesQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := uhrq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, userhasroles.FieldID)
 		for i := range fields {
-			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			if fields[i] != userhasroles.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
 		}
 		if uhrq.withUsers != nil {
 			_spec.Node.AddColumnOnce(userhasroles.FieldUserID)

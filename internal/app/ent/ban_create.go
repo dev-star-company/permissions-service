@@ -113,7 +113,9 @@ func (bc *BanCreate) Mutation() *BanMutation {
 
 // Save creates the Ban in the database.
 func (bc *BanCreate) Save(ctx context.Context) (*Ban, error) {
-	bc.defaults()
+	if err := bc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, bc.sqlSave, bc.mutation, bc.hooks)
 }
 
@@ -140,15 +142,22 @@ func (bc *BanCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (bc *BanCreate) defaults() {
+func (bc *BanCreate) defaults() error {
 	if _, ok := bc.mutation.CreatedAt(); !ok {
+		if ban.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized ban.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := ban.DefaultCreatedAt()
 		bc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := bc.mutation.UpdatedAt(); !ok {
+		if ban.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized ban.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := ban.DefaultUpdatedAt()
 		bc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

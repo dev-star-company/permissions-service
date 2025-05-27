@@ -127,7 +127,9 @@ func (pc *PhoneCreate) Mutation() *PhoneMutation {
 
 // Save creates the Phone in the database.
 func (pc *PhoneCreate) Save(ctx context.Context) (*Phone, error) {
-	pc.defaults()
+	if err := pc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
@@ -154,12 +156,18 @@ func (pc *PhoneCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pc *PhoneCreate) defaults() {
+func (pc *PhoneCreate) defaults() error {
 	if _, ok := pc.mutation.CreatedAt(); !ok {
+		if phone.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized phone.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := phone.DefaultCreatedAt()
 		pc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		if phone.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized phone.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := phone.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
@@ -167,6 +175,7 @@ func (pc *PhoneCreate) defaults() {
 		v := phone.DefaultMain
 		pc.mutation.SetMain(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

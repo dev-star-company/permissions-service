@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // RoleHasPermissionsQuery is the builder for querying RoleHasPermissions entities.
@@ -73,7 +74,7 @@ func (rhpq *RoleHasPermissionsQuery) QueryRoles() *RoleQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(rolehaspermissions.Table, rolehaspermissions.RolesColumn, selector),
+			sqlgraph.From(rolehaspermissions.Table, rolehaspermissions.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, rolehaspermissions.RolesTable, rolehaspermissions.RolesColumn),
 		)
@@ -95,7 +96,7 @@ func (rhpq *RoleHasPermissionsQuery) QueryPermissions() *PermissionQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(rolehaspermissions.Table, rolehaspermissions.PermissionsColumn, selector),
+			sqlgraph.From(rolehaspermissions.Table, rolehaspermissions.FieldID, selector),
 			sqlgraph.To(permission.Table, permission.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, rolehaspermissions.PermissionsTable, rolehaspermissions.PermissionsColumn),
 		)
@@ -127,6 +128,29 @@ func (rhpq *RoleHasPermissionsQuery) FirstX(ctx context.Context) *RoleHasPermiss
 	return node
 }
 
+// FirstID returns the first RoleHasPermissions ID from the query.
+// Returns a *NotFoundError when no RoleHasPermissions ID was found.
+func (rhpq *RoleHasPermissionsQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = rhpq.Limit(1).IDs(setContextOp(ctx, rhpq.ctx, ent.OpQueryFirstID)); err != nil {
+		return
+	}
+	if len(ids) == 0 {
+		err = &NotFoundError{rolehaspermissions.Label}
+		return
+	}
+	return ids[0], nil
+}
+
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (rhpq *RoleHasPermissionsQuery) FirstIDX(ctx context.Context) int {
+	id, err := rhpq.FirstID(ctx)
+	if err != nil && !IsNotFound(err) {
+		panic(err)
+	}
+	return id
+}
+
 // Only returns a single RoleHasPermissions entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one RoleHasPermissions entity is found.
 // Returns a *NotFoundError when no RoleHasPermissions entities are found.
@@ -154,6 +178,34 @@ func (rhpq *RoleHasPermissionsQuery) OnlyX(ctx context.Context) *RoleHasPermissi
 	return node
 }
 
+// OnlyID is like Only, but returns the only RoleHasPermissions ID in the query.
+// Returns a *NotSingularError when more than one RoleHasPermissions ID is found.
+// Returns a *NotFoundError when no entities are found.
+func (rhpq *RoleHasPermissionsQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = rhpq.Limit(2).IDs(setContextOp(ctx, rhpq.ctx, ent.OpQueryOnlyID)); err != nil {
+		return
+	}
+	switch len(ids) {
+	case 1:
+		id = ids[0]
+	case 0:
+		err = &NotFoundError{rolehaspermissions.Label}
+	default:
+		err = &NotSingularError{rolehaspermissions.Label}
+	}
+	return
+}
+
+// OnlyIDX is like OnlyID, but panics if an error occurs.
+func (rhpq *RoleHasPermissionsQuery) OnlyIDX(ctx context.Context) int {
+	id, err := rhpq.OnlyID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // All executes the query and returns a list of RoleHasPermissionsSlice.
 func (rhpq *RoleHasPermissionsQuery) All(ctx context.Context) ([]*RoleHasPermissions, error) {
 	ctx = setContextOp(ctx, rhpq.ctx, ent.OpQueryAll)
@@ -171,6 +223,27 @@ func (rhpq *RoleHasPermissionsQuery) AllX(ctx context.Context) []*RoleHasPermiss
 		panic(err)
 	}
 	return nodes
+}
+
+// IDs executes the query and returns a list of RoleHasPermissions IDs.
+func (rhpq *RoleHasPermissionsQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if rhpq.ctx.Unique == nil && rhpq.path != nil {
+		rhpq.Unique(true)
+	}
+	ctx = setContextOp(ctx, rhpq.ctx, ent.OpQueryIDs)
+	if err = rhpq.Select(rolehaspermissions.FieldID).Scan(ctx, &ids); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
+// IDsX is like IDs, but panics if an error occurs.
+func (rhpq *RoleHasPermissionsQuery) IDsX(ctx context.Context) []int {
+	ids, err := rhpq.IDs(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return ids
 }
 
 // Count returns the count of the given query.
@@ -194,7 +267,7 @@ func (rhpq *RoleHasPermissionsQuery) CountX(ctx context.Context) int {
 // Exist returns true if the query has elements in the graph.
 func (rhpq *RoleHasPermissionsQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, rhpq.ctx, ent.OpQueryExist)
-	switch _, err := rhpq.First(ctx); {
+	switch _, err := rhpq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -432,13 +505,15 @@ func (rhpq *RoleHasPermissionsQuery) loadPermissions(ctx context.Context, query 
 
 func (rhpq *RoleHasPermissionsQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := rhpq.querySpec()
-	_spec.Unique = false
-	_spec.Node.Columns = nil
+	_spec.Node.Columns = rhpq.ctx.Fields
+	if len(rhpq.ctx.Fields) > 0 {
+		_spec.Unique = rhpq.ctx.Unique != nil && *rhpq.ctx.Unique
+	}
 	return sqlgraph.CountNodes(ctx, rhpq.driver, _spec)
 }
 
 func (rhpq *RoleHasPermissionsQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(rolehaspermissions.Table, rolehaspermissions.Columns, nil)
+	_spec := sqlgraph.NewQuerySpec(rolehaspermissions.Table, rolehaspermissions.Columns, sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt))
 	_spec.From = rhpq.sql
 	if unique := rhpq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -447,8 +522,11 @@ func (rhpq *RoleHasPermissionsQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := rhpq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, rolehaspermissions.FieldID)
 		for i := range fields {
-			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			if fields[i] != rolehaspermissions.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
 		}
 		if rhpq.withRoles != nil {
 			_spec.Node.AddColumnOnce(rolehaspermissions.FieldRoleID)

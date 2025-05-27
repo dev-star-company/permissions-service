@@ -10,6 +10,51 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
+// ID filters vertices based on their ID field.
+func ID(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldEQ(FieldID, id))
+}
+
+// IDEQ applies the EQ predicate on the ID field.
+func IDEQ(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldEQ(FieldID, id))
+}
+
+// IDNEQ applies the NEQ predicate on the ID field.
+func IDNEQ(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldNEQ(FieldID, id))
+}
+
+// IDIn applies the In predicate on the ID field.
+func IDIn(ids ...int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldIn(FieldID, ids...))
+}
+
+// IDNotIn applies the NotIn predicate on the ID field.
+func IDNotIn(ids ...int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldNotIn(FieldID, ids...))
+}
+
+// IDGT applies the GT predicate on the ID field.
+func IDGT(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldGT(FieldID, id))
+}
+
+// IDGTE applies the GTE predicate on the ID field.
+func IDGTE(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldGTE(FieldID, id))
+}
+
+// IDLT applies the LT predicate on the ID field.
+func IDLT(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldLT(FieldID, id))
+}
+
+// IDLTE applies the LTE predicate on the ID field.
+func IDLTE(id int) predicate.RoleHasPermissions {
+	return predicate.RoleHasPermissions(sql.FieldLTE(FieldID, id))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.RoleHasPermissions {
 	return predicate.RoleHasPermissions(sql.FieldEQ(FieldCreatedAt, v))
@@ -354,7 +399,7 @@ func PermissionIDNotIn(vs ...int) predicate.RoleHasPermissions {
 func HasRoles() predicate.RoleHasPermissions {
 	return predicate.RoleHasPermissions(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, RolesColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, RolesTable, RolesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -377,7 +422,7 @@ func HasRolesWith(preds ...predicate.Role) predicate.RoleHasPermissions {
 func HasPermissions() predicate.RoleHasPermissions {
 	return predicate.RoleHasPermissions(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, PermissionsColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, PermissionsTable, PermissionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

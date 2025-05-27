@@ -121,7 +121,9 @@ func (lac *LoginAttemptsCreate) Mutation() *LoginAttemptsMutation {
 
 // Save creates the LoginAttempts in the database.
 func (lac *LoginAttemptsCreate) Save(ctx context.Context) (*LoginAttempts, error) {
-	lac.defaults()
+	if err := lac.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, lac.sqlSave, lac.mutation, lac.hooks)
 }
 
@@ -148,12 +150,18 @@ func (lac *LoginAttemptsCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (lac *LoginAttemptsCreate) defaults() {
+func (lac *LoginAttemptsCreate) defaults() error {
 	if _, ok := lac.mutation.CreatedAt(); !ok {
+		if loginattempts.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized loginattempts.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := loginattempts.DefaultCreatedAt()
 		lac.mutation.SetCreatedAt(v)
 	}
 	if _, ok := lac.mutation.UpdatedAt(); !ok {
+		if loginattempts.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized loginattempts.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := loginattempts.DefaultUpdatedAt()
 		lac.mutation.SetUpdatedAt(v)
 	}
@@ -161,6 +169,7 @@ func (lac *LoginAttemptsCreate) defaults() {
 		v := loginattempts.DefaultSuccessful
 		lac.mutation.SetSuccessful(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

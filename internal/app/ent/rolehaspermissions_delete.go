@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // RoleHasPermissionsDelete is the builder for deleting a RoleHasPermissions entity.
@@ -39,7 +40,7 @@ func (rhpd *RoleHasPermissionsDelete) ExecX(ctx context.Context) int {
 }
 
 func (rhpd *RoleHasPermissionsDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(rolehaspermissions.Table, nil)
+	_spec := sqlgraph.NewDeleteSpec(rolehaspermissions.Table, sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt))
 	if ps := rhpd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

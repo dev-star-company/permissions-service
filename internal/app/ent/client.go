@@ -422,12 +422,14 @@ func (c *BanClient) QueryUser(b *Ban) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *BanClient) Hooks() []Hook {
-	return c.hooks.Ban
+	hooks := c.hooks.Ban
+	return append(hooks[:len(hooks):len(hooks)], ban.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *BanClient) Interceptors() []Interceptor {
-	return c.inters.Ban
+	inters := c.inters.Ban
+	return append(inters[:len(inters):len(inters)], ban.Interceptors[:]...)
 }
 
 func (c *BanClient) mutate(ctx context.Context, m *BanMutation) (Value, error) {
@@ -571,12 +573,14 @@ func (c *EmailClient) QueryUser(e *Email) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *EmailClient) Hooks() []Hook {
-	return c.hooks.Email
+	hooks := c.hooks.Email
+	return append(hooks[:len(hooks):len(hooks)], email.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *EmailClient) Interceptors() []Interceptor {
-	return c.inters.Email
+	inters := c.inters.Email
+	return append(inters[:len(inters):len(inters)], email.Interceptors[:]...)
 }
 
 func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, error) {
@@ -720,12 +724,14 @@ func (c *FirstLoginClient) QueryUser(fl *FirstLogin) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *FirstLoginClient) Hooks() []Hook {
-	return c.hooks.FirstLogin
+	hooks := c.hooks.FirstLogin
+	return append(hooks[:len(hooks):len(hooks)], firstlogin.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *FirstLoginClient) Interceptors() []Interceptor {
-	return c.inters.FirstLogin
+	inters := c.inters.FirstLogin
+	return append(inters[:len(inters):len(inters)], firstlogin.Interceptors[:]...)
 }
 
 func (c *FirstLoginClient) mutate(ctx context.Context, m *FirstLoginMutation) (Value, error) {
@@ -869,12 +875,14 @@ func (c *LoginAttemptsClient) QueryUser(la *LoginAttempts) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *LoginAttemptsClient) Hooks() []Hook {
-	return c.hooks.LoginAttempts
+	hooks := c.hooks.LoginAttempts
+	return append(hooks[:len(hooks):len(hooks)], loginattempts.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *LoginAttemptsClient) Interceptors() []Interceptor {
-	return c.inters.LoginAttempts
+	inters := c.inters.LoginAttempts
+	return append(inters[:len(inters):len(inters)], loginattempts.Interceptors[:]...)
 }
 
 func (c *LoginAttemptsClient) mutate(ctx context.Context, m *LoginAttemptsMutation) (Value, error) {
@@ -1018,12 +1026,14 @@ func (c *PasswordClient) QueryUser(pa *Password) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *PasswordClient) Hooks() []Hook {
-	return c.hooks.Password
+	hooks := c.hooks.Password
+	return append(hooks[:len(hooks):len(hooks)], password.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *PasswordClient) Interceptors() []Interceptor {
-	return c.inters.Password
+	inters := c.inters.Password
+	return append(inters[:len(inters):len(inters)], password.Interceptors[:]...)
 }
 
 func (c *PasswordClient) mutate(ctx context.Context, m *PasswordMutation) (Value, error) {
@@ -1172,7 +1182,7 @@ func (c *PermissionClient) QueryRoleHasPermissions(pe *Permission) *RoleHasPermi
 		id := pe.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, id),
-			sqlgraph.To(rolehaspermissions.Table, rolehaspermissions.PermissionsColumn),
+			sqlgraph.To(rolehaspermissions.Table, rolehaspermissions.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, permission.RoleHasPermissionsTable, permission.RoleHasPermissionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
@@ -1183,12 +1193,14 @@ func (c *PermissionClient) QueryRoleHasPermissions(pe *Permission) *RoleHasPermi
 
 // Hooks returns the client hooks.
 func (c *PermissionClient) Hooks() []Hook {
-	return c.hooks.Permission
+	hooks := c.hooks.Permission
+	return append(hooks[:len(hooks):len(hooks)], permission.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *PermissionClient) Interceptors() []Interceptor {
-	return c.inters.Permission
+	inters := c.inters.Permission
+	return append(inters[:len(inters):len(inters)], permission.Interceptors[:]...)
 }
 
 func (c *PermissionClient) mutate(ctx context.Context, m *PermissionMutation) (Value, error) {
@@ -1332,12 +1344,14 @@ func (c *PhoneClient) QueryUser(ph *Phone) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *PhoneClient) Hooks() []Hook {
-	return c.hooks.Phone
+	hooks := c.hooks.Phone
+	return append(hooks[:len(hooks):len(hooks)], phone.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *PhoneClient) Interceptors() []Interceptor {
-	return c.inters.Phone
+	inters := c.inters.Phone
+	return append(inters[:len(inters):len(inters)], phone.Interceptors[:]...)
 }
 
 func (c *PhoneClient) mutate(ctx context.Context, m *PhoneMutation) (Value, error) {
@@ -1479,15 +1493,15 @@ func (c *RoleClient) QueryPermissions(r *Role) *PermissionQuery {
 	return query
 }
 
-// QueryPermission queries the permission edge of a Role.
-func (c *RoleClient) QueryPermission(r *Role) *UserQuery {
+// QueryUsers queries the users edge of a Role.
+func (c *RoleClient) QueryUsers(r *Role) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, role.PermissionTable, role.PermissionPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, role.UsersTable, role.UsersPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -1502,7 +1516,7 @@ func (c *RoleClient) QueryRoleHasPermissions(r *Role) *RoleHasPermissionsQuery {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
-			sqlgraph.To(rolehaspermissions.Table, rolehaspermissions.RolesColumn),
+			sqlgraph.To(rolehaspermissions.Table, rolehaspermissions.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, role.RoleHasPermissionsTable, role.RoleHasPermissionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
@@ -1518,7 +1532,7 @@ func (c *RoleClient) QueryUserHasRoles(r *Role) *UserHasRolesQuery {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
-			sqlgraph.To(userhasroles.Table, userhasroles.RolesColumn),
+			sqlgraph.To(userhasroles.Table, userhasroles.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, role.UserHasRolesTable, role.UserHasRolesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
@@ -1529,12 +1543,14 @@ func (c *RoleClient) QueryUserHasRoles(r *Role) *UserHasRolesQuery {
 
 // Hooks returns the client hooks.
 func (c *RoleClient) Hooks() []Hook {
-	return c.hooks.Role
+	hooks := c.hooks.Role
+	return append(hooks[:len(hooks):len(hooks)], role.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *RoleClient) Interceptors() []Interceptor {
-	return c.inters.Role
+	inters := c.inters.Role
+	return append(inters[:len(inters):len(inters)], role.Interceptors[:]...)
 }
 
 func (c *RoleClient) mutate(ctx context.Context, m *RoleMutation) (Value, error) {
@@ -1608,9 +1624,13 @@ func (c *RoleHasPermissionsClient) Update() *RoleHasPermissionsUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *RoleHasPermissionsClient) UpdateOne(rhp *RoleHasPermissions) *RoleHasPermissionsUpdateOne {
-	mutation := newRoleHasPermissionsMutation(c.config, OpUpdateOne)
-	mutation.roles = &rhp.RoleID
-	mutation.permissions = &rhp.PermissionID
+	mutation := newRoleHasPermissionsMutation(c.config, OpUpdateOne, withRoleHasPermissions(rhp))
+	return &RoleHasPermissionsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RoleHasPermissionsClient) UpdateOneID(id int) *RoleHasPermissionsUpdateOne {
+	mutation := newRoleHasPermissionsMutation(c.config, OpUpdateOne, withRoleHasPermissionsID(id))
 	return &RoleHasPermissionsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1618,6 +1638,19 @@ func (c *RoleHasPermissionsClient) UpdateOne(rhp *RoleHasPermissions) *RoleHasPe
 func (c *RoleHasPermissionsClient) Delete() *RoleHasPermissionsDelete {
 	mutation := newRoleHasPermissionsMutation(c.config, OpDelete)
 	return &RoleHasPermissionsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RoleHasPermissionsClient) DeleteOne(rhp *RoleHasPermissions) *RoleHasPermissionsDeleteOne {
+	return c.DeleteOneID(rhp.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RoleHasPermissionsClient) DeleteOneID(id int) *RoleHasPermissionsDeleteOne {
+	builder := c.Delete().Where(rolehaspermissions.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RoleHasPermissionsDeleteOne{builder}
 }
 
 // Query returns a query builder for RoleHasPermissions.
@@ -1629,28 +1662,62 @@ func (c *RoleHasPermissionsClient) Query() *RoleHasPermissionsQuery {
 	}
 }
 
+// Get returns a RoleHasPermissions entity by its id.
+func (c *RoleHasPermissionsClient) Get(ctx context.Context, id int) (*RoleHasPermissions, error) {
+	return c.Query().Where(rolehaspermissions.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RoleHasPermissionsClient) GetX(ctx context.Context, id int) *RoleHasPermissions {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
 // QueryRoles queries the roles edge of a RoleHasPermissions.
 func (c *RoleHasPermissionsClient) QueryRoles(rhp *RoleHasPermissions) *RoleQuery {
-	return c.Query().
-		Where(rolehaspermissions.RoleID(rhp.RoleID), rolehaspermissions.PermissionID(rhp.PermissionID)).
-		QueryRoles()
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rhp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rolehaspermissions.Table, rolehaspermissions.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, rolehaspermissions.RolesTable, rolehaspermissions.RolesColumn),
+		)
+		fromV = sqlgraph.Neighbors(rhp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryPermissions queries the permissions edge of a RoleHasPermissions.
 func (c *RoleHasPermissionsClient) QueryPermissions(rhp *RoleHasPermissions) *PermissionQuery {
-	return c.Query().
-		Where(rolehaspermissions.RoleID(rhp.RoleID), rolehaspermissions.PermissionID(rhp.PermissionID)).
-		QueryPermissions()
+	query := (&PermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rhp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rolehaspermissions.Table, rolehaspermissions.FieldID, id),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, rolehaspermissions.PermissionsTable, rolehaspermissions.PermissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(rhp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
 func (c *RoleHasPermissionsClient) Hooks() []Hook {
-	return c.hooks.RoleHasPermissions
+	hooks := c.hooks.RoleHasPermissions
+	return append(hooks[:len(hooks):len(hooks)], rolehaspermissions.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *RoleHasPermissionsClient) Interceptors() []Interceptor {
-	return c.inters.RoleHasPermissions
+	inters := c.inters.RoleHasPermissions
+	return append(inters[:len(inters):len(inters)], rolehaspermissions.Interceptors[:]...)
 }
 
 func (c *RoleHasPermissionsClient) mutate(ctx context.Context, m *RoleHasPermissionsMutation) (Value, error) {
@@ -1794,12 +1861,14 @@ func (c *ServicesClient) QueryPermission(s *Services) *PermissionQuery {
 
 // Hooks returns the client hooks.
 func (c *ServicesClient) Hooks() []Hook {
-	return c.hooks.Services
+	hooks := c.hooks.Services
+	return append(hooks[:len(hooks):len(hooks)], services.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *ServicesClient) Interceptors() []Interceptor {
-	return c.inters.Services
+	inters := c.inters.Services
+	return append(inters[:len(inters):len(inters)], services.Interceptors[:]...)
 }
 
 func (c *ServicesClient) mutate(ctx context.Context, m *ServicesMutation) (Value, error) {
@@ -2044,7 +2113,7 @@ func (c *UserClient) QueryUserHasRoles(u *User) *UserHasRolesQuery {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userhasroles.Table, userhasroles.UsersColumn),
+			sqlgraph.To(userhasroles.Table, userhasroles.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.UserHasRolesTable, user.UserHasRolesColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
@@ -2055,12 +2124,14 @@ func (c *UserClient) QueryUserHasRoles(u *User) *UserHasRolesQuery {
 
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
-	return c.hooks.User
+	hooks := c.hooks.User
+	return append(hooks[:len(hooks):len(hooks)], user.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *UserClient) Interceptors() []Interceptor {
-	return c.inters.User
+	inters := c.inters.User
+	return append(inters[:len(inters):len(inters)], user.Interceptors[:]...)
 }
 
 func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error) {
@@ -2134,9 +2205,13 @@ func (c *UserHasRolesClient) Update() *UserHasRolesUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *UserHasRolesClient) UpdateOne(uhr *UserHasRoles) *UserHasRolesUpdateOne {
-	mutation := newUserHasRolesMutation(c.config, OpUpdateOne)
-	mutation.users = &uhr.UserID
-	mutation.roles = &uhr.RoleID
+	mutation := newUserHasRolesMutation(c.config, OpUpdateOne, withUserHasRoles(uhr))
+	return &UserHasRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserHasRolesClient) UpdateOneID(id int) *UserHasRolesUpdateOne {
+	mutation := newUserHasRolesMutation(c.config, OpUpdateOne, withUserHasRolesID(id))
 	return &UserHasRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2144,6 +2219,19 @@ func (c *UserHasRolesClient) UpdateOne(uhr *UserHasRoles) *UserHasRolesUpdateOne
 func (c *UserHasRolesClient) Delete() *UserHasRolesDelete {
 	mutation := newUserHasRolesMutation(c.config, OpDelete)
 	return &UserHasRolesDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserHasRolesClient) DeleteOne(uhr *UserHasRoles) *UserHasRolesDeleteOne {
+	return c.DeleteOneID(uhr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserHasRolesClient) DeleteOneID(id int) *UserHasRolesDeleteOne {
+	builder := c.Delete().Where(userhasroles.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserHasRolesDeleteOne{builder}
 }
 
 // Query returns a query builder for UserHasRoles.
@@ -2155,28 +2243,62 @@ func (c *UserHasRolesClient) Query() *UserHasRolesQuery {
 	}
 }
 
+// Get returns a UserHasRoles entity by its id.
+func (c *UserHasRolesClient) Get(ctx context.Context, id int) (*UserHasRoles, error) {
+	return c.Query().Where(userhasroles.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserHasRolesClient) GetX(ctx context.Context, id int) *UserHasRoles {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
 // QueryUsers queries the users edge of a UserHasRoles.
 func (c *UserHasRolesClient) QueryUsers(uhr *UserHasRoles) *UserQuery {
-	return c.Query().
-		Where(userhasroles.UserID(uhr.UserID), userhasroles.RoleID(uhr.RoleID)).
-		QueryUsers()
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := uhr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userhasroles.Table, userhasroles.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, userhasroles.UsersTable, userhasroles.UsersColumn),
+		)
+		fromV = sqlgraph.Neighbors(uhr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryRoles queries the roles edge of a UserHasRoles.
 func (c *UserHasRolesClient) QueryRoles(uhr *UserHasRoles) *RoleQuery {
-	return c.Query().
-		Where(userhasroles.UserID(uhr.UserID), userhasroles.RoleID(uhr.RoleID)).
-		QueryRoles()
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := uhr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userhasroles.Table, userhasroles.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, userhasroles.RolesTable, userhasroles.RolesColumn),
+		)
+		fromV = sqlgraph.Neighbors(uhr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
 func (c *UserHasRolesClient) Hooks() []Hook {
-	return c.hooks.UserHasRoles
+	hooks := c.hooks.UserHasRoles
+	return append(hooks[:len(hooks):len(hooks)], userhasroles.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *UserHasRolesClient) Interceptors() []Interceptor {
-	return c.inters.UserHasRoles
+	inters := c.inters.UserHasRoles
+	return append(inters[:len(inters):len(inters)], userhasroles.Interceptors[:]...)
 }
 
 func (c *UserHasRolesClient) mutate(ctx context.Context, m *UserHasRolesMutation) (Value, error) {

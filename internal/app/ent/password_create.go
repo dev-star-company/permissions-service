@@ -113,7 +113,9 @@ func (pc *PasswordCreate) Mutation() *PasswordMutation {
 
 // Save creates the Password in the database.
 func (pc *PasswordCreate) Save(ctx context.Context) (*Password, error) {
-	pc.defaults()
+	if err := pc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
@@ -140,15 +142,22 @@ func (pc *PasswordCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pc *PasswordCreate) defaults() {
+func (pc *PasswordCreate) defaults() error {
 	if _, ok := pc.mutation.CreatedAt(); !ok {
+		if password.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized password.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := password.DefaultCreatedAt()
 		pc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		if password.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized password.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := password.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

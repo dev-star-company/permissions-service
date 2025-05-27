@@ -5,6 +5,7 @@ package user
 import (
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -133,7 +134,14 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "permission-service/internal/app/ent/runtime"
 var (
+	Hooks        [1]ent.Hook
+	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -361,7 +369,7 @@ func newRolesStep() *sqlgraph.Step {
 func newUserHasRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserHasRolesInverseTable, UserHasRolesColumn),
+		sqlgraph.To(UserHasRolesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, UserHasRolesTable, UserHasRolesColumn),
 	)
 }

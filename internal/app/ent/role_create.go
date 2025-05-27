@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"permission-service/internal/app/ent/permission"
 	"permission-service/internal/app/ent/role"
+	"permission-service/internal/app/ent/rolehaspermissions"
 	"permission-service/internal/app/ent/user"
+	"permission-service/internal/app/ent/userhasroles"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -139,13 +141,49 @@ func (rc *RoleCreate) AddPermissions(p ...*Permission) *RoleCreate {
 	return rc.AddPermissionIDs(ids...)
 }
 
-// AddPermission adds the "permission" edges to the User entity.
-func (rc *RoleCreate) AddPermission(u ...*User) *RoleCreate {
+// AddUserIDs adds the "users" edge to the User entity by IDs.
+func (rc *RoleCreate) AddUserIDs(ids ...int) *RoleCreate {
+	rc.mutation.AddUserIDs(ids...)
+	return rc
+}
+
+// AddUsers adds the "users" edges to the User entity.
+func (rc *RoleCreate) AddUsers(u ...*User) *RoleCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return rc.AddPermissionIDs(ids...)
+	return rc.AddUserIDs(ids...)
+}
+
+// AddRoleHasPermissionIDs adds the "role_has_permissions" edge to the RoleHasPermissions entity by IDs.
+func (rc *RoleCreate) AddRoleHasPermissionIDs(ids ...int) *RoleCreate {
+	rc.mutation.AddRoleHasPermissionIDs(ids...)
+	return rc
+}
+
+// AddRoleHasPermissions adds the "role_has_permissions" edges to the RoleHasPermissions entity.
+func (rc *RoleCreate) AddRoleHasPermissions(r ...*RoleHasPermissions) *RoleCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return rc.AddRoleHasPermissionIDs(ids...)
+}
+
+// AddUserHasRoleIDs adds the "user_has_roles" edge to the UserHasRoles entity by IDs.
+func (rc *RoleCreate) AddUserHasRoleIDs(ids ...int) *RoleCreate {
+	rc.mutation.AddUserHasRoleIDs(ids...)
+	return rc
+}
+
+// AddUserHasRoles adds the "user_has_roles" edges to the UserHasRoles entity.
+func (rc *RoleCreate) AddUserHasRoles(u ...*UserHasRoles) *RoleCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return rc.AddUserHasRoleIDs(ids...)
 }
 
 // Mutation returns the RoleMutation object of the builder.
@@ -155,7 +193,9 @@ func (rc *RoleCreate) Mutation() *RoleMutation {
 
 // Save creates the Role in the database.
 func (rc *RoleCreate) Save(ctx context.Context) (*Role, error) {
-	rc.defaults()
+	if err := rc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
 }
 
@@ -182,12 +222,18 @@ func (rc *RoleCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (rc *RoleCreate) defaults() {
+func (rc *RoleCreate) defaults() error {
 	if _, ok := rc.mutation.CreatedAt(); !ok {
+		if role.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized role.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := role.DefaultCreatedAt()
 		rc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := rc.mutation.UpdatedAt(); !ok {
+		if role.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized role.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := role.DefaultUpdatedAt()
 		rc.mutation.SetUpdatedAt(v)
 	}
@@ -195,6 +241,7 @@ func (rc *RoleCreate) defaults() {
 		v := role.DefaultIsActive
 		rc.mutation.SetIsActive(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -314,17 +361,17 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RoleHasPermissionsCreate{config: rc.config, mutation: newRoleHasPermissionsMutation(rc.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.PermissionIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   role.PermissionTable,
-			Columns: role.PermissionPrimaryKey,
+			Table:   role.UsersTable,
+			Columns: role.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -334,9 +381,41 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserHasRolesCreate{config: rc.config, mutation: newUserHasRolesMutation(rc.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.RoleHasPermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   role.RoleHasPermissionsTable,
+			Columns: []string{role.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.UserHasRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   role.UserHasRolesTable,
+			Columns: []string{role.UserHasRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userhasroles.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

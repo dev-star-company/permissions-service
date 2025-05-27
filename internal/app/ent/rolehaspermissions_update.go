@@ -173,7 +173,9 @@ func (rhpu *RoleHasPermissionsUpdate) ClearPermissions() *RoleHasPermissionsUpda
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (rhpu *RoleHasPermissionsUpdate) Save(ctx context.Context) (int, error) {
-	rhpu.defaults()
+	if err := rhpu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, rhpu.sqlSave, rhpu.mutation, rhpu.hooks)
 }
 
@@ -200,11 +202,15 @@ func (rhpu *RoleHasPermissionsUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (rhpu *RoleHasPermissionsUpdate) defaults() {
+func (rhpu *RoleHasPermissionsUpdate) defaults() error {
 	if _, ok := rhpu.mutation.UpdatedAt(); !ok {
+		if rolehaspermissions.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolehaspermissions.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolehaspermissions.UpdateDefaultUpdatedAt()
 		rhpu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -237,7 +243,7 @@ func (rhpu *RoleHasPermissionsUpdate) sqlSave(ctx context.Context) (n int, err e
 	if err := rhpu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(rolehaspermissions.Table, rolehaspermissions.Columns, sqlgraph.NewFieldSpec(rolehaspermissions.FieldRoleID, field.TypeInt), sqlgraph.NewFieldSpec(rolehaspermissions.FieldPermissionID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(rolehaspermissions.Table, rolehaspermissions.Columns, sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt))
 	if ps := rhpu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -503,7 +509,9 @@ func (rhpuo *RoleHasPermissionsUpdateOne) Select(field string, fields ...string)
 
 // Save executes the query and returns the updated RoleHasPermissions entity.
 func (rhpuo *RoleHasPermissionsUpdateOne) Save(ctx context.Context) (*RoleHasPermissions, error) {
-	rhpuo.defaults()
+	if err := rhpuo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, rhpuo.sqlSave, rhpuo.mutation, rhpuo.hooks)
 }
 
@@ -530,11 +538,15 @@ func (rhpuo *RoleHasPermissionsUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (rhpuo *RoleHasPermissionsUpdateOne) defaults() {
+func (rhpuo *RoleHasPermissionsUpdateOne) defaults() error {
 	if _, ok := rhpuo.mutation.UpdatedAt(); !ok {
+		if rolehaspermissions.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolehaspermissions.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolehaspermissions.UpdateDefaultUpdatedAt()
 		rhpuo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -567,24 +579,22 @@ func (rhpuo *RoleHasPermissionsUpdateOne) sqlSave(ctx context.Context) (_node *R
 	if err := rhpuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(rolehaspermissions.Table, rolehaspermissions.Columns, sqlgraph.NewFieldSpec(rolehaspermissions.FieldRoleID, field.TypeInt), sqlgraph.NewFieldSpec(rolehaspermissions.FieldPermissionID, field.TypeInt))
-	if id, ok := rhpuo.mutation.RoleID(); !ok {
-		return nil, &ValidationError{Name: "role_id", err: errors.New(`ent: missing "RoleHasPermissions.role_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[0].Value = id
+	_spec := sqlgraph.NewUpdateSpec(rolehaspermissions.Table, rolehaspermissions.Columns, sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt))
+	id, ok := rhpuo.mutation.ID()
+	if !ok {
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "RoleHasPermissions.id" for update`)}
 	}
-	if id, ok := rhpuo.mutation.PermissionID(); !ok {
-		return nil, &ValidationError{Name: "permission_id", err: errors.New(`ent: missing "RoleHasPermissions.permission_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[1].Value = id
-	}
+	_spec.Node.ID.Value = id
 	if fields := rhpuo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, len(fields))
-		for i, f := range fields {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, rolehaspermissions.FieldID)
+		for _, f := range fields {
 			if !rolehaspermissions.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			_spec.Node.Columns[i] = f
+			if f != rolehaspermissions.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, f)
+			}
 		}
 	}
 	if ps := rhpuo.mutation.predicates; len(ps) > 0 {

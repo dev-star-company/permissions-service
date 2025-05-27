@@ -127,7 +127,9 @@ func (ec *EmailCreate) Mutation() *EmailMutation {
 
 // Save creates the Email in the database.
 func (ec *EmailCreate) Save(ctx context.Context) (*Email, error) {
-	ec.defaults()
+	if err := ec.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
@@ -154,12 +156,18 @@ func (ec *EmailCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (ec *EmailCreate) defaults() {
+func (ec *EmailCreate) defaults() error {
 	if _, ok := ec.mutation.CreatedAt(); !ok {
+		if email.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized email.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := email.DefaultCreatedAt()
 		ec.mutation.SetCreatedAt(v)
 	}
 	if _, ok := ec.mutation.UpdatedAt(); !ok {
+		if email.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized email.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := email.DefaultUpdatedAt()
 		ec.mutation.SetUpdatedAt(v)
 	}
@@ -167,6 +175,7 @@ func (ec *EmailCreate) defaults() {
 		v := email.DefaultMain
 		ec.mutation.SetMain(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

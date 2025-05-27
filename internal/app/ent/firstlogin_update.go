@@ -149,7 +149,9 @@ func (flu *FirstLoginUpdate) ClearUser() *FirstLoginUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (flu *FirstLoginUpdate) Save(ctx context.Context) (int, error) {
-	flu.defaults()
+	if err := flu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, flu.sqlSave, flu.mutation, flu.hooks)
 }
 
@@ -176,11 +178,15 @@ func (flu *FirstLoginUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (flu *FirstLoginUpdate) defaults() {
+func (flu *FirstLoginUpdate) defaults() error {
 	if _, ok := flu.mutation.UpdatedAt(); !ok {
+		if firstlogin.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized firstlogin.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := firstlogin.UpdateDefaultUpdatedAt()
 		flu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -417,7 +423,9 @@ func (fluo *FirstLoginUpdateOne) Select(field string, fields ...string) *FirstLo
 
 // Save executes the query and returns the updated FirstLogin entity.
 func (fluo *FirstLoginUpdateOne) Save(ctx context.Context) (*FirstLogin, error) {
-	fluo.defaults()
+	if err := fluo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, fluo.sqlSave, fluo.mutation, fluo.hooks)
 }
 
@@ -444,11 +452,15 @@ func (fluo *FirstLoginUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (fluo *FirstLoginUpdateOne) defaults() {
+func (fluo *FirstLoginUpdateOne) defaults() error {
 	if _, ok := fluo.mutation.UpdatedAt(); !ok {
+		if firstlogin.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized firstlogin.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := firstlogin.UpdateDefaultUpdatedAt()
 		fluo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -19,11 +18,11 @@ func (UserHasRoles) Mixin() []ent.Mixin {
 	}
 }
 
-func (UserHasRoles) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		field.ID("user_id", "role_id"),
-	}
-}
+// func (UserHasRoles) Annotations() []schema.Annotation {
+// 	return []schema.Annotation{
+// 		field.ID("user_id", "role_id"),
+// 	}
+// }
 
 // Fields of the UserHasRoles.
 func (UserHasRoles) Fields() []ent.Field {

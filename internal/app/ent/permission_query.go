@@ -99,7 +99,7 @@ func (pq *PermissionQuery) QueryRoleHasPermissions() *RoleHasPermissionsQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, selector),
-			sqlgraph.To(rolehaspermissions.Table, rolehaspermissions.PermissionsColumn),
+			sqlgraph.To(rolehaspermissions.Table, rolehaspermissions.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, permission.RoleHasPermissionsTable, permission.RoleHasPermissionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
@@ -539,7 +539,7 @@ func (pq *PermissionQuery) loadRoleHasPermissions(ctx context.Context, query *Ro
 		fk := n.PermissionID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "permission_id" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "permission_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

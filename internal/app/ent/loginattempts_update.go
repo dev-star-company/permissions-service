@@ -149,7 +149,9 @@ func (lau *LoginAttemptsUpdate) ClearUser() *LoginAttemptsUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (lau *LoginAttemptsUpdate) Save(ctx context.Context) (int, error) {
-	lau.defaults()
+	if err := lau.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, lau.sqlSave, lau.mutation, lau.hooks)
 }
 
@@ -176,11 +178,15 @@ func (lau *LoginAttemptsUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (lau *LoginAttemptsUpdate) defaults() {
+func (lau *LoginAttemptsUpdate) defaults() error {
 	if _, ok := lau.mutation.UpdatedAt(); !ok {
+		if loginattempts.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized loginattempts.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := loginattempts.UpdateDefaultUpdatedAt()
 		lau.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -417,7 +423,9 @@ func (lauo *LoginAttemptsUpdateOne) Select(field string, fields ...string) *Logi
 
 // Save executes the query and returns the updated LoginAttempts entity.
 func (lauo *LoginAttemptsUpdateOne) Save(ctx context.Context) (*LoginAttempts, error) {
-	lauo.defaults()
+	if err := lauo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, lauo.sqlSave, lauo.mutation, lauo.hooks)
 }
 
@@ -444,11 +452,15 @@ func (lauo *LoginAttemptsUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (lauo *LoginAttemptsUpdateOne) defaults() {
+func (lauo *LoginAttemptsUpdateOne) defaults() error {
 	if _, ok := lauo.mutation.UpdatedAt(); !ok {
+		if loginattempts.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized loginattempts.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := loginattempts.UpdateDefaultUpdatedAt()
 		lauo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

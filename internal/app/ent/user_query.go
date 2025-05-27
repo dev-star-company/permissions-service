@@ -242,7 +242,7 @@ func (uq *UserQuery) QueryUserHasRoles() *UserHasRolesQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(userhasroles.Table, userhasroles.UsersColumn),
+			sqlgraph.To(userhasroles.Table, userhasroles.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.UserHasRolesTable, user.UserHasRolesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
@@ -979,7 +979,7 @@ func (uq *UserQuery) loadUserHasRoles(ctx context.Context, query *UserHasRolesQu
 		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

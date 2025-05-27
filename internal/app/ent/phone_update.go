@@ -163,7 +163,9 @@ func (pu *PhoneUpdate) ClearUser() *PhoneUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *PhoneUpdate) Save(ctx context.Context) (int, error) {
-	pu.defaults()
+	if err := pu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
 }
 
@@ -190,11 +192,15 @@ func (pu *PhoneUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pu *PhoneUpdate) defaults() {
+func (pu *PhoneUpdate) defaults() error {
 	if _, ok := pu.mutation.UpdatedAt(); !ok {
+		if phone.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized phone.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := phone.UpdateDefaultUpdatedAt()
 		pu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -453,7 +459,9 @@ func (puo *PhoneUpdateOne) Select(field string, fields ...string) *PhoneUpdateOn
 
 // Save executes the query and returns the updated Phone entity.
 func (puo *PhoneUpdateOne) Save(ctx context.Context) (*Phone, error) {
-	puo.defaults()
+	if err := puo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
 
@@ -480,11 +488,15 @@ func (puo *PhoneUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (puo *PhoneUpdateOne) defaults() {
+func (puo *PhoneUpdateOne) defaults() error {
 	if _, ok := puo.mutation.UpdatedAt(); !ok {
+		if phone.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized phone.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := phone.UpdateDefaultUpdatedAt()
 		puo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

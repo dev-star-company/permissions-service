@@ -131,7 +131,9 @@ func (rhpc *RoleHasPermissionsCreate) Mutation() *RoleHasPermissionsMutation {
 
 // Save creates the RoleHasPermissions in the database.
 func (rhpc *RoleHasPermissionsCreate) Save(ctx context.Context) (*RoleHasPermissions, error) {
-	rhpc.defaults()
+	if err := rhpc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, rhpc.sqlSave, rhpc.mutation, rhpc.hooks)
 }
 
@@ -158,15 +160,22 @@ func (rhpc *RoleHasPermissionsCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (rhpc *RoleHasPermissionsCreate) defaults() {
+func (rhpc *RoleHasPermissionsCreate) defaults() error {
 	if _, ok := rhpc.mutation.CreatedAt(); !ok {
+		if rolehaspermissions.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolehaspermissions.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolehaspermissions.DefaultCreatedAt()
 		rhpc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := rhpc.mutation.UpdatedAt(); !ok {
+		if rolehaspermissions.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolehaspermissions.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolehaspermissions.DefaultUpdatedAt()
 		rhpc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -229,13 +238,17 @@ func (rhpc *RoleHasPermissionsCreate) sqlSave(ctx context.Context) (*RoleHasPerm
 		}
 		return nil, err
 	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
+	rhpc.mutation.id = &_node.ID
+	rhpc.mutation.done = true
 	return _node, nil
 }
 
 func (rhpc *RoleHasPermissionsCreate) createSpec() (*RoleHasPermissions, *sqlgraph.CreateSpec) {
 	var (
 		_node = &RoleHasPermissions{config: rhpc.config}
-		_spec = sqlgraph.NewCreateSpec(rolehaspermissions.Table, nil)
+		_spec = sqlgraph.NewCreateSpec(rolehaspermissions.Table, sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt))
 	)
 	if value, ok := rhpc.mutation.CreatedAt(); ok {
 		_spec.SetField(rolehaspermissions.FieldCreatedAt, field.TypeTime, value)
@@ -341,6 +354,11 @@ func (rhpcb *RoleHasPermissionsCreateBulk) Save(ctx context.Context) ([]*RoleHas
 				}
 				if err != nil {
 					return nil, err
+				}
+				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

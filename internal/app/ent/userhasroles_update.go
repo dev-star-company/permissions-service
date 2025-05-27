@@ -173,7 +173,9 @@ func (uhru *UserHasRolesUpdate) ClearRoles() *UserHasRolesUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (uhru *UserHasRolesUpdate) Save(ctx context.Context) (int, error) {
-	uhru.defaults()
+	if err := uhru.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, uhru.sqlSave, uhru.mutation, uhru.hooks)
 }
 
@@ -200,11 +202,15 @@ func (uhru *UserHasRolesUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (uhru *UserHasRolesUpdate) defaults() {
+func (uhru *UserHasRolesUpdate) defaults() error {
 	if _, ok := uhru.mutation.UpdatedAt(); !ok {
+		if userhasroles.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized userhasroles.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := userhasroles.UpdateDefaultUpdatedAt()
 		uhru.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -237,7 +243,7 @@ func (uhru *UserHasRolesUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if err := uhru.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(userhasroles.Table, userhasroles.Columns, sqlgraph.NewFieldSpec(userhasroles.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(userhasroles.FieldRoleID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(userhasroles.Table, userhasroles.Columns, sqlgraph.NewFieldSpec(userhasroles.FieldID, field.TypeInt))
 	if ps := uhru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -503,7 +509,9 @@ func (uhruo *UserHasRolesUpdateOne) Select(field string, fields ...string) *User
 
 // Save executes the query and returns the updated UserHasRoles entity.
 func (uhruo *UserHasRolesUpdateOne) Save(ctx context.Context) (*UserHasRoles, error) {
-	uhruo.defaults()
+	if err := uhruo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, uhruo.sqlSave, uhruo.mutation, uhruo.hooks)
 }
 
@@ -530,11 +538,15 @@ func (uhruo *UserHasRolesUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (uhruo *UserHasRolesUpdateOne) defaults() {
+func (uhruo *UserHasRolesUpdateOne) defaults() error {
 	if _, ok := uhruo.mutation.UpdatedAt(); !ok {
+		if userhasroles.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized userhasroles.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := userhasroles.UpdateDefaultUpdatedAt()
 		uhruo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -567,24 +579,22 @@ func (uhruo *UserHasRolesUpdateOne) sqlSave(ctx context.Context) (_node *UserHas
 	if err := uhruo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(userhasroles.Table, userhasroles.Columns, sqlgraph.NewFieldSpec(userhasroles.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(userhasroles.FieldRoleID, field.TypeInt))
-	if id, ok := uhruo.mutation.UserID(); !ok {
-		return nil, &ValidationError{Name: "user_id", err: errors.New(`ent: missing "UserHasRoles.user_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[0].Value = id
+	_spec := sqlgraph.NewUpdateSpec(userhasroles.Table, userhasroles.Columns, sqlgraph.NewFieldSpec(userhasroles.FieldID, field.TypeInt))
+	id, ok := uhruo.mutation.ID()
+	if !ok {
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "UserHasRoles.id" for update`)}
 	}
-	if id, ok := uhruo.mutation.RoleID(); !ok {
-		return nil, &ValidationError{Name: "role_id", err: errors.New(`ent: missing "UserHasRoles.role_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[1].Value = id
-	}
+	_spec.Node.ID.Value = id
 	if fields := uhruo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, len(fields))
-		for i, f := range fields {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, userhasroles.FieldID)
+		for _, f := range fields {
 			if !userhasroles.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			_spec.Node.Columns[i] = f
+			if f != userhasroles.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, f)
+			}
 		}
 	}
 	if ps := uhruo.mutation.predicates; len(ps) > 0 {

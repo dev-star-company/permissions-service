@@ -30,7 +30,7 @@ func (Role) Mixin() []ent.Mixin {
 func (Role) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("permissions", Permission.Type).Through("role_has_permissions", RoleHasPermissions.Type),
-		edge.From("permission", User.Type).Ref("roles").Through("user_has_roles", UserHasRoles.Type),
+		edge.From("users", User.Type).Ref("roles").Through("user_has_roles", UserHasRoles.Type),
 	}
 }
 

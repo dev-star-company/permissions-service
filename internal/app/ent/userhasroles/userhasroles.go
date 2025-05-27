@@ -5,6 +5,7 @@ package userhasroles
 import (
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,6 +13,8 @@ import (
 const (
 	// Label holds the string label denoting the userhasroles type in the database.
 	Label = "user_has_roles"
+	// FieldID holds the string denoting the id field in the database.
+	FieldID = "id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -32,10 +35,6 @@ const (
 	EdgeUsers = "users"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
-	// UserFieldID holds the string denoting the ID field of the User.
-	UserFieldID = "id"
-	// RoleFieldID holds the string denoting the ID field of the Role.
-	RoleFieldID = "id"
 	// Table holds the table name of the userhasroles in the database.
 	Table = "user_has_roles"
 	// UsersTable is the table that holds the users relation/edge.
@@ -56,6 +55,7 @@ const (
 
 // Columns holds all SQL columns for userhasroles fields.
 var Columns = []string{
+	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
@@ -76,7 +76,14 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "permission-service/internal/app/ent/runtime"
 var (
+	Hooks        [1]ent.Hook
+	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -95,6 +102,11 @@ var (
 
 // OrderOption defines the ordering options for the UserHasRoles queries.
 type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
 
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
@@ -151,15 +163,15 @@ func ByRolesField(field string, opts ...sql.OrderTermOption) OrderOption {
 }
 func newUsersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, UsersColumn),
-		sqlgraph.To(UsersInverseTable, UserFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UsersInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, UsersTable, UsersColumn),
 	)
 }
 func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, RolesColumn),
-		sqlgraph.To(RolesInverseTable, RoleFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RolesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, RolesTable, RolesColumn),
 	)
 }

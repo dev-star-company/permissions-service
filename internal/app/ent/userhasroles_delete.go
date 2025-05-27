@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // UserHasRolesDelete is the builder for deleting a UserHasRoles entity.
@@ -39,7 +40,7 @@ func (uhrd *UserHasRolesDelete) ExecX(ctx context.Context) int {
 }
 
 func (uhrd *UserHasRolesDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(userhasroles.Table, nil)
+	_spec := sqlgraph.NewDeleteSpec(userhasroles.Table, sqlgraph.NewFieldSpec(userhasroles.FieldID, field.TypeInt))
 	if ps := uhrd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

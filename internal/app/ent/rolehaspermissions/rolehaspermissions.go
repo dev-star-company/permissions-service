@@ -5,6 +5,7 @@ package rolehaspermissions
 import (
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -34,10 +35,6 @@ const (
 	EdgeRoles = "roles"
 	// EdgePermissions holds the string denoting the permissions edge name in mutations.
 	EdgePermissions = "permissions"
-	// RoleFieldID holds the string denoting the ID field of the Role.
-	RoleFieldID = "id"
-	// PermissionFieldID holds the string denoting the ID field of the Permission.
-	PermissionFieldID = "id"
 	// Table holds the table name of the rolehaspermissions in the database.
 	Table = "role_has_permissions"
 	// RolesTable is the table that holds the roles relation/edge.
@@ -79,7 +76,14 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "permission-service/internal/app/ent/runtime"
 var (
+	Hooks        [1]ent.Hook
+	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -98,6 +102,11 @@ var (
 
 // OrderOption defines the ordering options for the RoleHasPermissions queries.
 type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
 
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
@@ -154,15 +163,15 @@ func ByPermissionsField(field string, opts ...sql.OrderTermOption) OrderOption {
 }
 func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, RolesColumn),
-		sqlgraph.To(RolesInverseTable, RoleFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RolesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, RolesTable, RolesColumn),
 	)
 }
 func newPermissionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, PermissionsColumn),
-		sqlgraph.To(PermissionsInverseTable, PermissionFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PermissionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, PermissionsTable, PermissionsColumn),
 	)
 }

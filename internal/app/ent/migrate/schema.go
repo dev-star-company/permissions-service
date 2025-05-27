@@ -217,6 +217,7 @@ var (
 	}
 	// RoleHasPermissionsColumns holds the columns for the "role_has_permissions" table.
 	RoleHasPermissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
@@ -230,17 +231,17 @@ var (
 	RoleHasPermissionsTable = &schema.Table{
 		Name:       "role_has_permissions",
 		Columns:    RoleHasPermissionsColumns,
-		PrimaryKey: []*schema.Column{RoleHasPermissionsColumns[6], RoleHasPermissionsColumns[7]},
+		PrimaryKey: []*schema.Column{RoleHasPermissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "role_has_permissions_roles_roles",
-				Columns:    []*schema.Column{RoleHasPermissionsColumns[6]},
+				Columns:    []*schema.Column{RoleHasPermissionsColumns[7]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "role_has_permissions_permissions_permissions",
-				Columns:    []*schema.Column{RoleHasPermissionsColumns[7]},
+				Columns:    []*schema.Column{RoleHasPermissionsColumns[8]},
 				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -249,7 +250,7 @@ var (
 			{
 				Name:    "rolehaspermissions_role_id_permission_id",
 				Unique:  true,
-				Columns: []*schema.Column{RoleHasPermissionsColumns[6], RoleHasPermissionsColumns[7]},
+				Columns: []*schema.Column{RoleHasPermissionsColumns[7], RoleHasPermissionsColumns[8]},
 			},
 		},
 	}
@@ -290,6 +291,7 @@ var (
 	}
 	// UserHasRolesColumns holds the columns for the "user_has_roles" table.
 	UserHasRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
@@ -303,17 +305,17 @@ var (
 	UserHasRolesTable = &schema.Table{
 		Name:       "user_has_roles",
 		Columns:    UserHasRolesColumns,
-		PrimaryKey: []*schema.Column{UserHasRolesColumns[6], UserHasRolesColumns[7]},
+		PrimaryKey: []*schema.Column{UserHasRolesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "user_has_roles_users_users",
-				Columns:    []*schema.Column{UserHasRolesColumns[6]},
+				Columns:    []*schema.Column{UserHasRolesColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "user_has_roles_roles_roles",
-				Columns:    []*schema.Column{UserHasRolesColumns[7]},
+				Columns:    []*schema.Column{UserHasRolesColumns[8]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -322,7 +324,7 @@ var (
 			{
 				Name:    "userhasroles_user_id_role_id",
 				Unique:  true,
-				Columns: []*schema.Column{UserHasRolesColumns[6], UserHasRolesColumns[7]},
+				Columns: []*schema.Column{UserHasRolesColumns[7], UserHasRolesColumns[8]},
 			},
 		},
 	}

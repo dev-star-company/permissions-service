@@ -131,7 +131,9 @@ func (uhrc *UserHasRolesCreate) Mutation() *UserHasRolesMutation {
 
 // Save creates the UserHasRoles in the database.
 func (uhrc *UserHasRolesCreate) Save(ctx context.Context) (*UserHasRoles, error) {
-	uhrc.defaults()
+	if err := uhrc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, uhrc.sqlSave, uhrc.mutation, uhrc.hooks)
 }
 
@@ -158,15 +160,22 @@ func (uhrc *UserHasRolesCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (uhrc *UserHasRolesCreate) defaults() {
+func (uhrc *UserHasRolesCreate) defaults() error {
 	if _, ok := uhrc.mutation.CreatedAt(); !ok {
+		if userhasroles.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized userhasroles.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := userhasroles.DefaultCreatedAt()
 		uhrc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := uhrc.mutation.UpdatedAt(); !ok {
+		if userhasroles.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized userhasroles.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := userhasroles.DefaultUpdatedAt()
 		uhrc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -229,13 +238,17 @@ func (uhrc *UserHasRolesCreate) sqlSave(ctx context.Context) (*UserHasRoles, err
 		}
 		return nil, err
 	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
+	uhrc.mutation.id = &_node.ID
+	uhrc.mutation.done = true
 	return _node, nil
 }
 
 func (uhrc *UserHasRolesCreate) createSpec() (*UserHasRoles, *sqlgraph.CreateSpec) {
 	var (
 		_node = &UserHasRoles{config: uhrc.config}
-		_spec = sqlgraph.NewCreateSpec(userhasroles.Table, nil)
+		_spec = sqlgraph.NewCreateSpec(userhasroles.Table, sqlgraph.NewFieldSpec(userhasroles.FieldID, field.TypeInt))
 	)
 	if value, ok := uhrc.mutation.CreatedAt(); ok {
 		_spec.SetField(userhasroles.FieldCreatedAt, field.TypeTime, value)
@@ -341,6 +354,11 @@ func (uhrcb *UserHasRolesCreateBulk) Save(ctx context.Context) ([]*UserHasRoles,
 				}
 				if err != nil {
 					return nil, err
+				}
+				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

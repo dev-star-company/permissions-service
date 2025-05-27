@@ -45,8 +45,8 @@ type Role struct {
 type RoleEdges struct {
 	// Permissions holds the value of the permissions edge.
 	Permissions []*Permission `json:"permissions,omitempty"`
-	// Permission holds the value of the permission edge.
-	Permission []*User `json:"permission,omitempty"`
+	// Users holds the value of the users edge.
+	Users []*User `json:"users,omitempty"`
 	// RoleHasPermissions holds the value of the role_has_permissions edge.
 	RoleHasPermissions []*RoleHasPermissions `json:"role_has_permissions,omitempty"`
 	// UserHasRoles holds the value of the user_has_roles edge.
@@ -65,13 +65,13 @@ func (e RoleEdges) PermissionsOrErr() ([]*Permission, error) {
 	return nil, &NotLoadedError{edge: "permissions"}
 }
 
-// PermissionOrErr returns the Permission value or an error if the edge
+// UsersOrErr returns the Users value or an error if the edge
 // was not loaded in eager-loading.
-func (e RoleEdges) PermissionOrErr() ([]*User, error) {
+func (e RoleEdges) UsersOrErr() ([]*User, error) {
 	if e.loadedTypes[1] {
-		return e.Permission, nil
+		return e.Users, nil
 	}
-	return nil, &NotLoadedError{edge: "permission"}
+	return nil, &NotLoadedError{edge: "users"}
 }
 
 // RoleHasPermissionsOrErr returns the RoleHasPermissions value or an error if the edge
@@ -200,9 +200,9 @@ func (r *Role) QueryPermissions() *PermissionQuery {
 	return NewRoleClient(r.config).QueryPermissions(r)
 }
 
-// QueryPermission queries the "permission" edge of the Role entity.
-func (r *Role) QueryPermission() *UserQuery {
-	return NewRoleClient(r.config).QueryPermission(r)
+// QueryUsers queries the "users" edge of the Role entity.
+func (r *Role) QueryUsers() *UserQuery {
+	return NewRoleClient(r.config).QueryUsers(r)
 }
 
 // QueryRoleHasPermissions queries the "role_has_permissions" edge of the Role entity.

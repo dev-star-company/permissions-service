@@ -149,7 +149,9 @@ func (pu *PasswordUpdate) ClearUser() *PasswordUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *PasswordUpdate) Save(ctx context.Context) (int, error) {
-	pu.defaults()
+	if err := pu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
 }
 
@@ -176,11 +178,15 @@ func (pu *PasswordUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pu *PasswordUpdate) defaults() {
+func (pu *PasswordUpdate) defaults() error {
 	if _, ok := pu.mutation.UpdatedAt(); !ok {
+		if password.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized password.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := password.UpdateDefaultUpdatedAt()
 		pu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -422,7 +428,9 @@ func (puo *PasswordUpdateOne) Select(field string, fields ...string) *PasswordUp
 
 // Save executes the query and returns the updated Password entity.
 func (puo *PasswordUpdateOne) Save(ctx context.Context) (*Password, error) {
-	puo.defaults()
+	if err := puo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
 
@@ -449,11 +457,15 @@ func (puo *PasswordUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (puo *PasswordUpdateOne) defaults() {
+func (puo *PasswordUpdateOne) defaults() error {
 	if _, ok := puo.mutation.UpdatedAt(); !ok {
+		if password.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized password.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := password.UpdateDefaultUpdatedAt()
 		puo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

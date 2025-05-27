@@ -149,7 +149,9 @@ func (bu *BanUpdate) ClearUser() *BanUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (bu *BanUpdate) Save(ctx context.Context) (int, error) {
-	bu.defaults()
+	if err := bu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, bu.sqlSave, bu.mutation, bu.hooks)
 }
 
@@ -176,11 +178,15 @@ func (bu *BanUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (bu *BanUpdate) defaults() {
+func (bu *BanUpdate) defaults() error {
 	if _, ok := bu.mutation.UpdatedAt(); !ok {
+		if ban.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized ban.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := ban.UpdateDefaultUpdatedAt()
 		bu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -417,7 +423,9 @@ func (buo *BanUpdateOne) Select(field string, fields ...string) *BanUpdateOne {
 
 // Save executes the query and returns the updated Ban entity.
 func (buo *BanUpdateOne) Save(ctx context.Context) (*Ban, error) {
-	buo.defaults()
+	if err := buo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, buo.sqlSave, buo.mutation, buo.hooks)
 }
 
@@ -444,11 +452,15 @@ func (buo *BanUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (buo *BanUpdateOne) defaults() {
+func (buo *BanUpdateOne) defaults() error {
 	if _, ok := buo.mutation.UpdatedAt(); !ok {
+		if ban.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized ban.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := ban.UpdateDefaultUpdatedAt()
 		buo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

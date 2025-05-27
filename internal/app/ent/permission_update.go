@@ -9,6 +9,7 @@ import (
 	"permission-service/internal/app/ent/permission"
 	"permission-service/internal/app/ent/predicate"
 	"permission-service/internal/app/ent/role"
+	"permission-service/internal/app/ent/rolehaspermissions"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -201,6 +202,21 @@ func (pu *PermissionUpdate) AddRoles(r ...*Role) *PermissionUpdate {
 	return pu.AddRoleIDs(ids...)
 }
 
+// AddRoleHasPermissionIDs adds the "role_has_permissions" edge to the RoleHasPermissions entity by IDs.
+func (pu *PermissionUpdate) AddRoleHasPermissionIDs(ids ...int) *PermissionUpdate {
+	pu.mutation.AddRoleHasPermissionIDs(ids...)
+	return pu
+}
+
+// AddRoleHasPermissions adds the "role_has_permissions" edges to the RoleHasPermissions entity.
+func (pu *PermissionUpdate) AddRoleHasPermissions(r ...*RoleHasPermissions) *PermissionUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pu.AddRoleHasPermissionIDs(ids...)
+}
+
 // Mutation returns the PermissionMutation object of the builder.
 func (pu *PermissionUpdate) Mutation() *PermissionMutation {
 	return pu.mutation
@@ -227,9 +243,32 @@ func (pu *PermissionUpdate) RemoveRoles(r ...*Role) *PermissionUpdate {
 	return pu.RemoveRoleIDs(ids...)
 }
 
+// ClearRoleHasPermissions clears all "role_has_permissions" edges to the RoleHasPermissions entity.
+func (pu *PermissionUpdate) ClearRoleHasPermissions() *PermissionUpdate {
+	pu.mutation.ClearRoleHasPermissions()
+	return pu
+}
+
+// RemoveRoleHasPermissionIDs removes the "role_has_permissions" edge to RoleHasPermissions entities by IDs.
+func (pu *PermissionUpdate) RemoveRoleHasPermissionIDs(ids ...int) *PermissionUpdate {
+	pu.mutation.RemoveRoleHasPermissionIDs(ids...)
+	return pu
+}
+
+// RemoveRoleHasPermissions removes "role_has_permissions" edges to RoleHasPermissions entities.
+func (pu *PermissionUpdate) RemoveRoleHasPermissions(r ...*RoleHasPermissions) *PermissionUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pu.RemoveRoleHasPermissionIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *PermissionUpdate) Save(ctx context.Context) (int, error) {
-	pu.defaults()
+	if err := pu.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
 }
 
@@ -256,11 +295,15 @@ func (pu *PermissionUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (pu *PermissionUpdate) defaults() {
+func (pu *PermissionUpdate) defaults() error {
 	if _, ok := pu.mutation.UpdatedAt(); !ok {
+		if permission.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized permission.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := permission.UpdateDefaultUpdatedAt()
 		pu.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -357,7 +400,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		}
 		createE := &RoleHasPermissionsCreate{config: pu.config, mutation: newRoleHasPermissionsMutation(pu.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -377,7 +420,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RoleHasPermissionsCreate{config: pu.config, mutation: newRoleHasPermissionsMutation(pu.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -397,9 +440,54 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RoleHasPermissionsCreate{config: pu.config, mutation: newRoleHasPermissionsMutation(pu.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.RoleHasPermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedRoleHasPermissionsIDs(); len(nodes) > 0 && !pu.mutation.RoleHasPermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RoleHasPermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
@@ -594,6 +682,21 @@ func (puo *PermissionUpdateOne) AddRoles(r ...*Role) *PermissionUpdateOne {
 	return puo.AddRoleIDs(ids...)
 }
 
+// AddRoleHasPermissionIDs adds the "role_has_permissions" edge to the RoleHasPermissions entity by IDs.
+func (puo *PermissionUpdateOne) AddRoleHasPermissionIDs(ids ...int) *PermissionUpdateOne {
+	puo.mutation.AddRoleHasPermissionIDs(ids...)
+	return puo
+}
+
+// AddRoleHasPermissions adds the "role_has_permissions" edges to the RoleHasPermissions entity.
+func (puo *PermissionUpdateOne) AddRoleHasPermissions(r ...*RoleHasPermissions) *PermissionUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return puo.AddRoleHasPermissionIDs(ids...)
+}
+
 // Mutation returns the PermissionMutation object of the builder.
 func (puo *PermissionUpdateOne) Mutation() *PermissionMutation {
 	return puo.mutation
@@ -620,6 +723,27 @@ func (puo *PermissionUpdateOne) RemoveRoles(r ...*Role) *PermissionUpdateOne {
 	return puo.RemoveRoleIDs(ids...)
 }
 
+// ClearRoleHasPermissions clears all "role_has_permissions" edges to the RoleHasPermissions entity.
+func (puo *PermissionUpdateOne) ClearRoleHasPermissions() *PermissionUpdateOne {
+	puo.mutation.ClearRoleHasPermissions()
+	return puo
+}
+
+// RemoveRoleHasPermissionIDs removes the "role_has_permissions" edge to RoleHasPermissions entities by IDs.
+func (puo *PermissionUpdateOne) RemoveRoleHasPermissionIDs(ids ...int) *PermissionUpdateOne {
+	puo.mutation.RemoveRoleHasPermissionIDs(ids...)
+	return puo
+}
+
+// RemoveRoleHasPermissions removes "role_has_permissions" edges to RoleHasPermissions entities.
+func (puo *PermissionUpdateOne) RemoveRoleHasPermissions(r ...*RoleHasPermissions) *PermissionUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return puo.RemoveRoleHasPermissionIDs(ids...)
+}
+
 // Where appends a list predicates to the PermissionUpdate builder.
 func (puo *PermissionUpdateOne) Where(ps ...predicate.Permission) *PermissionUpdateOne {
 	puo.mutation.Where(ps...)
@@ -635,7 +759,9 @@ func (puo *PermissionUpdateOne) Select(field string, fields ...string) *Permissi
 
 // Save executes the query and returns the updated Permission entity.
 func (puo *PermissionUpdateOne) Save(ctx context.Context) (*Permission, error) {
-	puo.defaults()
+	if err := puo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
 
@@ -662,11 +788,15 @@ func (puo *PermissionUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (puo *PermissionUpdateOne) defaults() {
+func (puo *PermissionUpdateOne) defaults() error {
 	if _, ok := puo.mutation.UpdatedAt(); !ok {
+		if permission.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized permission.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := permission.UpdateDefaultUpdatedAt()
 		puo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -780,7 +910,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			},
 		}
 		createE := &RoleHasPermissionsCreate{config: puo.config, mutation: newRoleHasPermissionsMutation(puo.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -800,7 +930,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RoleHasPermissionsCreate{config: puo.config, mutation: newRoleHasPermissionsMutation(puo.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -820,9 +950,54 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RoleHasPermissionsCreate{config: puo.config, mutation: newRoleHasPermissionsMutation(puo.config, OpCreate)}
-		createE.defaults()
+		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.RoleHasPermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedRoleHasPermissionsIDs(); len(nodes) > 0 && !puo.mutation.RoleHasPermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RoleHasPermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   permission.RoleHasPermissionsTable,
+			Columns: []string{permission.RoleHasPermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rolehaspermissions.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Permission{config: puo.config}

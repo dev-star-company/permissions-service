@@ -17,6 +17,8 @@ import (
 // RoleHasPermissions is the model entity for the RoleHasPermissions schema.
 type RoleHasPermissions struct {
 	config `json:"-"`
+	// ID of the ent.
+	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -77,7 +79,7 @@ func (*RoleHasPermissions) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case rolehaspermissions.FieldCreatedBy, rolehaspermissions.FieldUpdatedBy, rolehaspermissions.FieldDeletedBy, rolehaspermissions.FieldRoleID, rolehaspermissions.FieldPermissionID:
+		case rolehaspermissions.FieldID, rolehaspermissions.FieldCreatedBy, rolehaspermissions.FieldUpdatedBy, rolehaspermissions.FieldDeletedBy, rolehaspermissions.FieldRoleID, rolehaspermissions.FieldPermissionID:
 			values[i] = new(sql.NullInt64)
 		case rolehaspermissions.FieldCreatedAt, rolehaspermissions.FieldUpdatedAt, rolehaspermissions.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -96,6 +98,12 @@ func (rhp *RoleHasPermissions) assignValues(columns []string, values []any) erro
 	}
 	for i := range columns {
 		switch columns[i] {
+		case rolehaspermissions.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			rhp.ID = int(value.Int64)
 		case rolehaspermissions.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -191,6 +199,7 @@ func (rhp *RoleHasPermissions) Unwrap() *RoleHasPermissions {
 func (rhp *RoleHasPermissions) String() string {
 	var builder strings.Builder
 	builder.WriteString("RoleHasPermissions(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", rhp.ID))
 	builder.WriteString("created_at=")
 	builder.WriteString(rhp.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")

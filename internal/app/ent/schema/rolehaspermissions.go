@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -13,11 +12,11 @@ type RoleHasPermissions struct {
 	ent.Schema
 }
 
-func (RoleHasPermissions) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		field.ID("role_id", "permission_id"),
-	}
-}
+// func (RoleHasPermissions) Annotations() []schema.Annotation {
+// 	return []schema.Annotation{
+// 		field.ID("role_id", "permission_id"),
+// 	}
+// }
 
 func (RoleHasPermissions) Mixin() []ent.Mixin {
 	return []ent.Mixin{

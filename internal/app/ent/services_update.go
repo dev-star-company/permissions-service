@@ -160,7 +160,9 @@ func (su *ServicesUpdate) RemovePermission(p ...*Permission) *ServicesUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (su *ServicesUpdate) Save(ctx context.Context) (int, error) {
-	su.defaults()
+	if err := su.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, su.sqlSave, su.mutation, su.hooks)
 }
 
@@ -187,11 +189,15 @@ func (su *ServicesUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (su *ServicesUpdate) defaults() {
+func (su *ServicesUpdate) defaults() error {
 	if _, ok := su.mutation.UpdatedAt(); !ok {
+		if services.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized services.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := services.UpdateDefaultUpdatedAt()
 		su.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -457,7 +463,9 @@ func (suo *ServicesUpdateOne) Select(field string, fields ...string) *ServicesUp
 
 // Save executes the query and returns the updated Services entity.
 func (suo *ServicesUpdateOne) Save(ctx context.Context) (*Services, error) {
-	suo.defaults()
+	if err := suo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, suo.sqlSave, suo.mutation, suo.hooks)
 }
 
@@ -484,11 +492,15 @@ func (suo *ServicesUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (suo *ServicesUpdateOne) defaults() {
+func (suo *ServicesUpdateOne) defaults() error {
 	if _, ok := suo.mutation.UpdatedAt(); !ok {
+		if services.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized services.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := services.UpdateDefaultUpdatedAt()
 		suo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

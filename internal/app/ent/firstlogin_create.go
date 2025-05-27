@@ -121,7 +121,9 @@ func (flc *FirstLoginCreate) Mutation() *FirstLoginMutation {
 
 // Save creates the FirstLogin in the database.
 func (flc *FirstLoginCreate) Save(ctx context.Context) (*FirstLogin, error) {
-	flc.defaults()
+	if err := flc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, flc.sqlSave, flc.mutation, flc.hooks)
 }
 
@@ -148,12 +150,18 @@ func (flc *FirstLoginCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (flc *FirstLoginCreate) defaults() {
+func (flc *FirstLoginCreate) defaults() error {
 	if _, ok := flc.mutation.CreatedAt(); !ok {
+		if firstlogin.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized firstlogin.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := firstlogin.DefaultCreatedAt()
 		flc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := flc.mutation.UpdatedAt(); !ok {
+		if firstlogin.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized firstlogin.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := firstlogin.DefaultUpdatedAt()
 		flc.mutation.SetUpdatedAt(v)
 	}
@@ -161,6 +169,7 @@ func (flc *FirstLoginCreate) defaults() {
 		v := firstlogin.DefaultSuccessful
 		flc.mutation.SetSuccessful(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

@@ -5,6 +5,7 @@ import (
 	"permission-service/generated_protos/ban_proto"
 	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+	"time"
 )
 
 func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*ban_proto.CreateResponse, error) {
@@ -18,7 +19,14 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 		return nil, errs.StartProductsError(err)
 	}
 
+	expiresAt, err := time.Parse(time.RFC3339, in.ExpiresAt)
+	if err != nil {
+		return nil, errs.CreateError("expires_at", err)
+	}
+
 	create, err := c.Db.Ban.Create().
+		SetUserID(int(in.UserId)).
+		SetExpiresAt(expiresAt).
 		SetCreatedBy(int(in.RequesterId)).
 		SetUpdatedBy(int(in.RequesterId)).
 		Save(ctx)
@@ -33,5 +41,12 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 
 	return &ban_proto.CreateResponse{
 		RequesterId: uint32(create.CreatedBy),
+		UserId:      uint32(create.UserID),
+		ExpiresAt: func() string {
+			if create.ExpiresAt != nil {
+				return create.ExpiresAt.Format(time.RFC3339)
+			}
+			return ""
+		}(),
 	}, nil
 }

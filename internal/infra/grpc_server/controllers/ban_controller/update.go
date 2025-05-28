@@ -6,6 +6,7 @@ import (
 	"permission-service/internal/app/ent"
 	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+	"time"
 )
 
 func (c *controller) Update(ctx context.Context, in *ban_proto.UpdateRequest) (*ban_proto.UpdateResponse, error) {
@@ -41,5 +42,12 @@ func (c *controller) Update(ctx context.Context, in *ban_proto.UpdateRequest) (*
 
 	return &ban_proto.UpdateResponse{
 		RequesterId: uint32(ban.CreatedBy),
+		UserId:      uint32(ban.UserID),
+		ExpiresAt: func() string {
+			if ban.ExpiresAt != nil {
+				return ban.ExpiresAt.Format(time.RFC3339)
+			}
+			return ""
+		}(),
 	}, nil
 }

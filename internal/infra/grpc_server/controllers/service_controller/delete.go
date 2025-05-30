@@ -3,9 +3,10 @@ package service_controller
 import (
 	"context"
 	"permission-service/generated_protos/service_proto"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
 	"time"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Delete(ctx context.Context, in *service_proto.DeleteRequest) (*service_proto.DeleteResponse, error) {
@@ -15,7 +16,7 @@ func (c *controller) Delete(ctx context.Context, in *service_proto.DeleteRequest
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartProductsError(err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	err = tx.Services.UpdateOneID(int(in.Id)).
@@ -28,7 +29,7 @@ func (c *controller) Delete(ctx context.Context, in *service_proto.DeleteRequest
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, utils.Rollback(tx, errs.CommitProductsError(err))
+		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
 	return &service_proto.DeleteResponse{}, nil

@@ -7,8 +7,9 @@ import (
 	"permission-service/internal/adapters/grpc_controllers"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/app/ent/password"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) UpdateUser(ctx context.Context, in *users_proto.UpdateRequest) (*users_proto.UpdateResponse, error) {

@@ -3,8 +3,9 @@ package service_controller
 import (
 	"context"
 	"permission-service/generated_protos/service_proto"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Create(ctx context.Context, in *service_proto.CreateRequest) (*service_proto.CreateResponse, error) {
@@ -15,7 +16,7 @@ func (c *controller) Create(ctx context.Context, in *service_proto.CreateRequest
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartProductsError(err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	create, err := c.Db.Services.Create().
@@ -29,7 +30,7 @@ func (c *controller) Create(ctx context.Context, in *service_proto.CreateRequest
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, utils.Rollback(tx, errs.CommitProductsError(err))
+		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
 	return &service_proto.CreateResponse{

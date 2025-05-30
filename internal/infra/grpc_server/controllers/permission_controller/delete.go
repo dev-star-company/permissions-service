@@ -3,9 +3,10 @@ package permission_controller
 import (
 	"context"
 	"permission-service/generated_protos/permission_proto"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
 	"time"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Delete(ctx context.Context, in *permission_proto.DeleteRequest) (*permission_proto.DeleteResponse, error) {
@@ -15,7 +16,7 @@ func (c *controller) Delete(ctx context.Context, in *permission_proto.DeleteRequ
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartProductsError(err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	err = tx.Permission.UpdateOneID(int(in.Id)).
@@ -28,7 +29,7 @@ func (c *controller) Delete(ctx context.Context, in *permission_proto.DeleteRequ
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, utils.Rollback(tx, errs.CommitProductsError(err))
+		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
 	return &permission_proto.DeleteResponse{}, nil

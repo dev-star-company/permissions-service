@@ -7,8 +7,9 @@ import (
 	"permission-service/internal/app/ent/email"
 	"permission-service/internal/app/ent/phone"
 	"permission-service/internal/app/ent/user"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils/hash_password"
+
+	"github.com/dev-star-company/service-errors/errs"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

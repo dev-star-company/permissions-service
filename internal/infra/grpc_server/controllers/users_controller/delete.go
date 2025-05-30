@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"permission-service/generated_protos/users_proto"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Delete(ctx context.Context, in *users_proto.DeleteRequest) (*users_proto.DeleteResponse, error) {

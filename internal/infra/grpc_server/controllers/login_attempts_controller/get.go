@@ -5,7 +5,8 @@ import (
 	"permission-service/generated_protos/login_attempts_proto"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/app/ent/loginattempts"
-	"permission-service/internal/pkg/errs"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Get(ctx context.Context, in *login_attempts_proto.GetRequest) (*login_attempts_proto.GetResponse, error) {

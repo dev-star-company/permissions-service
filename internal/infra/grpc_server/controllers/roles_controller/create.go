@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"permission-service/generated_protos/roles_proto"
 	"permission-service/internal/adapters/grpc_controllers"
-	"permission-service/internal/pkg/errs"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Create(ctx context.Context, in *roles_proto.CreateRequest) (*roles_proto.CreateResponse, error) {

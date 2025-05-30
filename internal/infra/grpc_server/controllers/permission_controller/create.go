@@ -3,8 +3,9 @@ package permission_controller
 import (
 	"context"
 	"permission-service/generated_protos/permission_proto"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequest) (*permission_proto.CreateResponse, error) {
@@ -15,7 +16,7 @@ func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequ
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartProductsError(err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	create, err := c.Db.Permission.Create().
@@ -29,7 +30,7 @@ func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequ
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, utils.Rollback(tx, errs.CommitProductsError(err))
+		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
 	return &permission_proto.CreateResponse{

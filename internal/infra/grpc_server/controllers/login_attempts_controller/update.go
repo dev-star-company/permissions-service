@@ -4,8 +4,9 @@ import (
 	"context"
 	"permission-service/generated_protos/login_attempts_proto"
 	"permission-service/internal/app/ent"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Update(ctx context.Context, in *login_attempts_proto.UpdateRequest) (*login_attempts_proto.UpdateResponse, error) {
@@ -15,7 +16,7 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartProductsError(err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	var login_attempts *ent.LoginAttempts
@@ -44,7 +45,7 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, utils.Rollback(tx, errs.CommitProductsError(err))
+		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
 	return &login_attempts_proto.UpdateResponse{

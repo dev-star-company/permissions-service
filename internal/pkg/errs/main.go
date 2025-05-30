@@ -41,11 +41,11 @@ func DeleteError(entity string, err error) error {
 	return status.Errorf(codes.Internal, "%s: %v", errorDelete, err)
 }
 
-func CommitProductsError(err error) error {
+func CommitTransactionError(err error) error {
 	return status.Error(codes.Internal, fmt.Sprintf("%s: %v", commitProducts, err))
 }
 
-func StartProductsError(err error) error {
+func StartTransactionError(err error) error {
 	return status.Error(codes.Internal, fmt.Sprintf("%s: %v", startProducts, err))
 }
 

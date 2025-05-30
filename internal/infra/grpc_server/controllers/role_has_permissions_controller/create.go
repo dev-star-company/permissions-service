@@ -3,8 +3,9 @@ package role_has_permissions_controller
 import (
 	"context"
 	"permission-service/generated_protos/role_has_permissions_proto"
-	"permission-service/internal/pkg/errs"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.CreateRequest) (*role_has_permissions_proto.CreateResponse, error) {
@@ -15,7 +16,7 @@ func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartProductsError(err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	create, err := c.Db.RoleHasPermissions.Create().
@@ -28,7 +29,7 @@ func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, utils.Rollback(tx, errs.CommitProductsError(err))
+		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
 	return &role_has_permissions_proto.CreateResponse{

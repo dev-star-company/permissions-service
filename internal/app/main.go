@@ -8,7 +8,6 @@ import (
 	"permission-service/internal/app/ent"
 	"permission-service/internal/config/env"
 
-
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -40,7 +39,7 @@ func New(port int) {
 	)
 	grpcServer := grpc.NewServer(opts...)
 
-	// RegisterControllers(grpcServer, client)
+	RegisterControllers(grpcServer, client)
 	reflection.Register(grpcServer)
 
 	fmt.Printf("Server is running on port:%d\n", port)

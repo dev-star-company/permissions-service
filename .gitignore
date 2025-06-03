@@ -2,3 +2,4 @@ internal/app/ent/*
 !internal/app/ent/schema/
 !internal/app/ent/generate.go
 !internal/app/ent/internal
+.env

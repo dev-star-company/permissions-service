@@ -1,0 +1,19 @@
+services:
+  permissions_service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: permissions_service
+    ports:
+      - '0.0.0.0:5002:5002'
+    networks:
+      local_network:
+        ipv4_address: 172.18.0.6
+
+networks:
+  local_network:
+    name: local_network
+    external: true
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16

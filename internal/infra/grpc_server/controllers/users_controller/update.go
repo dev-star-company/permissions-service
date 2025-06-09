@@ -7,6 +7,7 @@ import (
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/password"
 	"permissions-service/internal/pkg/utils"
+	"permissions-service/internal/pkg/utils/hash_password"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
 
@@ -35,8 +36,9 @@ func (c *controller) UpdateUser(ctx context.Context, in *users_proto.UpdateReque
 	}
 
 	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
+		hashedPassword, _ := hash_password.Hash(*in.Password)
 		p, err := tx.Password.Create().
-			SetPassword(*in.Password).
+			SetPassword(hashedPassword).
 			SetCreatedBy(int(in.RequesterId)).
 			SetUpdatedBy(int(in.RequesterId)).
 			Save(ctx)

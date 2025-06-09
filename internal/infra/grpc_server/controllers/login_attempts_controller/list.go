@@ -3,13 +3,13 @@ package login_attempts_controller
 import (
 	"context"
 	"errors"
-	"permission-service/internal/adapters/grpc_controllers"
-	"permission-service/internal/app/ent"
-	"permission-service/internal/app/ent/loginattempts"
-	"permission-service/internal/app/ent/schema"
-	"permission-service/internal/pkg/utils"
+	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/app/ent"
+	"permissions-service/internal/app/ent/loginattempts"
+	"permissions-service/internal/app/ent/schema"
+	"permissions-service/internal/pkg/utils"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/login_attempts_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

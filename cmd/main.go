@@ -1,9 +1,9 @@
 package main
 
 import (
-	"permission-service/internal/app"
-	_ "permission-service/internal/app/ent/runtime"
-	"permission-service/internal/config/env"
+	"permissions-service/internal/app"
+	_ "permissions-service/internal/app/ent/runtime"
+	"permissions-service/internal/config/env"
 )
 
 func main() {

@@ -3,11 +3,12 @@ package users_controller
 import (
 	"context"
 	"fmt"
-	"permission-service/internal/adapters/grpc_controllers"
-	"permission-service/internal/app/ent/schema"
-	"permission-service/internal/app/ent/user"
+	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/app/ent/phone"
+	"permissions-service/internal/app/ent/schema"
+	"permissions-service/internal/app/ent/user"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
 )
 
 func (c *controller) List(ct context.Context, in *users_proto.ListRequest) (*users_proto.ListResponse, error) {
@@ -32,6 +33,10 @@ func (c *controller) List(ct context.Context, in *users_proto.ListRequest) (*use
 
 	if in.Surname != nil {
 		query = query.Where(user.SurnameContainsFold(*in.Surname))
+	}
+
+	if in.Phone != nil {
+		query = query.Where(user.HasPhonesWith(phone.PhoneContainsFold(*in.Phone)))
 	}
 
 	count, err := query.Count(ctx)

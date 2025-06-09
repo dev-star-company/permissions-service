@@ -2,9 +2,9 @@ package permission_controller
 
 import (
 	"context"
-	"permission-service/internal/app/ent"
+	"permissions-service/internal/app/ent"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/permission_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/permission_proto"
 )
 
 type Controller interface {

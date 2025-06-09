@@ -1,9 +1,9 @@
 package grpc_controllers
 
 import (
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/service_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/service_proto"
 
-	"permission-service/internal/app/ent"
+	"permissions-service/internal/app/ent"
 )
 
 func ServiceToProto(service *ent.Services) *service_proto.Service {

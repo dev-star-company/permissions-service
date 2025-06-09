@@ -2,10 +2,10 @@ package roles_controller
 
 import (
 	"context"
-	"permission-service/internal/adapters/grpc_controllers"
-	"permission-service/internal/app/ent/schema"
+	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/app/ent/schema"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/roles_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
 )
 
 func (c *controller) List(ct context.Context, in *roles_proto.ListRequest) (*roles_proto.ListResponse, error) {

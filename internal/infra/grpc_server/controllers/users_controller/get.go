@@ -3,11 +3,11 @@ package users_controller
 import (
 	"context"
 	"fmt"
-	"permission-service/internal/adapters/grpc_controllers"
-	"permission-service/internal/app/ent"
-	"permission-service/internal/app/ent/user"
+	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/app/ent"
+	"permissions-service/internal/app/ent/user"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

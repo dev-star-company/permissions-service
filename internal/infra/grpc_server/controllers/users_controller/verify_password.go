@@ -2,13 +2,14 @@ package users_controller
 
 import (
 	"context"
-	"permission-service/internal/app/ent"
-	"permission-service/internal/app/ent/email"
-	"permission-service/internal/app/ent/phone"
-	"permission-service/internal/app/ent/user"
-	"permission-service/internal/pkg/utils/hash_password"
+	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/app/ent"
+	"permissions-service/internal/app/ent/email"
+	"permissions-service/internal/app/ent/phone"
+	"permissions-service/internal/app/ent/user"
+	"permissions-service/internal/pkg/utils/hash_password"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 
@@ -66,6 +67,7 @@ func (c *controller) VerifyPassword(ctx context.Context, in *users_proto.VerifyP
 
 	if hash_password.Check(in.Password, u.Edges.Passwords[0].Password) {
 		r.Success = true
+		r.User = grpc_controllers.UserToProto(u)
 	}
 
 	return &r, nil

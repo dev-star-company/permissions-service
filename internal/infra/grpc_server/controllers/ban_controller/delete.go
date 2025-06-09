@@ -2,10 +2,10 @@ package ban_controller
 
 import (
 	"context"
-	"permission-service/internal/pkg/utils"
+	"permissions-service/internal/pkg/utils"
 	"time"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/ban_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/ban_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

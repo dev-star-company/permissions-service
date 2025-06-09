@@ -2,10 +2,10 @@ package login_attempts_controller
 
 import (
 	"context"
-	"permission-service/internal/app/ent"
-	"permission-service/internal/pkg/utils"
+	"permissions-service/internal/app/ent"
+	"permissions-service/internal/pkg/utils"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/login_attempts_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

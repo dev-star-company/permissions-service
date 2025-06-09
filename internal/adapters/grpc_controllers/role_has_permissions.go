@@ -1,9 +1,9 @@
 package grpc_controllers
 
 import (
-	"permission-service/internal/app/ent"
+	"permissions-service/internal/app/ent"
 
-	"github.com/dev-star-company/protos-go/permission-service/generated_protos/role_has_permissions_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/role_has_permissions_proto"
 )
 
 func RoleHasPermissionsToProto(role_has_permissions *ent.RoleHasPermissions) *role_has_permissions_proto.RoleHasPermissions {

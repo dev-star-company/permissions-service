@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"permission-service/internal/app/ent"
-	"permission-service/internal/config/env"
+	"permissions-service/internal/app/ent"
+	"permissions-service/internal/config/env"
 
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"

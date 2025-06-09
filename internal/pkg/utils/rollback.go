@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"log"
-	"permission-service/internal/app/ent"
+	"permissions-service/internal/app/ent"
 )
 
 func Rollback(tx *ent.Tx, originalErr error) error {

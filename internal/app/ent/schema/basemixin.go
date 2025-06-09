@@ -3,8 +3,8 @@ package schema
 import (
 	"context"
 	"fmt"
-	"permission-service/internal/app/ent/hook"
-	"permission-service/internal/app/ent/intercept"
+	"permissions-service/internal/app/ent/hook"
+	"permissions-service/internal/app/ent/intercept"
 	"time"
 
 	"entgo.io/ent"
@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 
-	gen "permission-service/internal/app/ent"
+	gen "permissions-service/internal/app/ent"
 )
 
 // BaseMixin holds the schema definition for the BaseMixin entity.

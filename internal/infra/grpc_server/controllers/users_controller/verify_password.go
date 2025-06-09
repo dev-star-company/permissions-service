@@ -19,10 +19,6 @@ import (
 
 // TO DO: add soft ban after 3 failed attempts
 func (c *controller) VerifyPassword(ctx context.Context, in *users_proto.VerifyPasswordRequest) (*users_proto.VerifyPasswordResponse, error) {
-	if in.RequesterId == 0 {
-		return nil, status.Error(codes.InvalidArgument, errs.RequesterIdRequired().Error())
-	}
-
 	if in.Password == "" {
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}

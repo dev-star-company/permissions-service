@@ -21,7 +21,7 @@ func (c *controller) UpdateUser(ctx context.Context, in *users_proto.UpdateReque
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, errs.StartTransactionError(err)
 	}
 
 	// Update the user in the database

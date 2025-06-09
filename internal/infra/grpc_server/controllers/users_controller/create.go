@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/pkg/utils/hash_password"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
 
@@ -41,8 +42,9 @@ func (c *controller) Create(ctx context.Context, in *users_proto.CreateRequest) 
 		return nil, err
 	}
 
+	hashedPassword, _ := hash_password.Hash(in.Password)
 	password, err := tx.Password.Create().
-		SetPassword(in.Password).
+		SetPassword(hashedPassword).
 		SetUserID(user.ID).
 		SetCreatedBy(int(in.RequesterId)).
 		SetUpdatedBy(int(in.RequesterId)).

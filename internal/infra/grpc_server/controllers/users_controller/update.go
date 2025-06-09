@@ -2,7 +2,6 @@ package users_controller
 
 import (
 	"context"
-	"fmt"
 	"permissions-service/internal/adapters/grpc_controllers"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/password"

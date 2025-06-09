@@ -1,14 +1,6 @@
 package app
 
 import (
-	"permission-service/generated_protos/ban_proto"
-	"permission-service/generated_protos/first_login_proto"
-	"permission-service/generated_protos/login_attempts_proto"
-	"permission-service/generated_protos/permission_proto"
-	"permission-service/generated_protos/role_has_permissions_proto"
-	"permission-service/generated_protos/roles_proto"
-	"permission-service/generated_protos/service_proto"
-	"permission-service/generated_protos/users_proto"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/infra/grpc_server/controllers/ban_controller"
 	"permission-service/internal/infra/grpc_server/controllers/first_login_controller"
@@ -18,6 +10,15 @@ import (
 	"permission-service/internal/infra/grpc_server/controllers/roles_controller"
 	"permission-service/internal/infra/grpc_server/controllers/service_controller"
 	"permission-service/internal/infra/grpc_server/controllers/users_controller"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/ban_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/first_login_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/login_attempts_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/permission_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/role_has_permissions_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/roles_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/service_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
 
 	"google.golang.org/grpc"
 )

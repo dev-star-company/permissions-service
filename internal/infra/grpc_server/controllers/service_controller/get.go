@@ -2,9 +2,10 @@ package service_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/service_proto"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/app/ent/services"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/service_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

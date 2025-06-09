@@ -2,9 +2,10 @@ package roles_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/roles_proto"
 	"permission-service/internal/adapters/grpc_controllers"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/roles_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

@@ -2,12 +2,13 @@ package users_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/users_proto"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/app/ent/email"
 	"permission-service/internal/app/ent/phone"
 	"permission-service/internal/app/ent/user"
 	"permission-service/internal/pkg/utils/hash_password"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 

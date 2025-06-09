@@ -3,8 +3,9 @@ package users_controller
 import (
 	"context"
 	"fmt"
-	"permission-service/generated_protos/users_proto"
 	"permission-service/internal/adapters/grpc_controllers"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

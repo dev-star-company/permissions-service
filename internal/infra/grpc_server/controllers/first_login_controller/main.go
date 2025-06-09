@@ -2,8 +2,9 @@ package first_login_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/first_login_proto"
 	"permission-service/internal/app/ent"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/first_login_proto"
 )
 
 type Controller interface {

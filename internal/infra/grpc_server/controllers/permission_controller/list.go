@@ -3,12 +3,13 @@ package permission_controller
 import (
 	"context"
 	"errors"
-	"permission-service/generated_protos/permission_proto"
 	"permission-service/internal/adapters/grpc_controllers"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/app/ent/permission"
 	"permission-service/internal/app/ent/schema"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/permission_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

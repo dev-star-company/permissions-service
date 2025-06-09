@@ -2,9 +2,10 @@ package role_has_permissions_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/role_has_permissions_proto"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/app/ent/rolehaspermissions"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/role_has_permissions_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

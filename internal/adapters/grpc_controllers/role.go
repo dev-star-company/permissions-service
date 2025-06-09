@@ -1,8 +1,9 @@
 package grpc_controllers
 
 import (
-	"permission-service/generated_protos/roles_proto"
 	"permission-service/internal/app/ent"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/roles_proto"
 )
 
 func RoleToProto(role *ent.Role) *roles_proto.Role {

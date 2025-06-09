@@ -1,8 +1,9 @@
 package grpc_controllers
 
 import (
-	"permission-service/generated_protos/login_attempts_proto"
 	"permission-service/internal/app/ent"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/login_attempts_proto"
 )
 
 func LoginAttemptsToProto(login_attempts *ent.LoginAttempts) *login_attempts_proto.LoginAttempts {

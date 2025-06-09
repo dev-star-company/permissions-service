@@ -2,9 +2,10 @@ package first_login_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/first_login_proto"
 	"permission-service/internal/app/ent"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/first_login_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

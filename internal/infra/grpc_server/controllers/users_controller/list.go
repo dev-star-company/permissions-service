@@ -3,10 +3,11 @@ package users_controller
 import (
 	"context"
 	"fmt"
-	"permission-service/generated_protos/users_proto"
 	"permission-service/internal/adapters/grpc_controllers"
 	"permission-service/internal/app/ent/schema"
 	"permission-service/internal/app/ent/user"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/users_proto"
 )
 
 func (c *controller) List(ct context.Context, in *users_proto.ListRequest) (*users_proto.ListResponse, error) {

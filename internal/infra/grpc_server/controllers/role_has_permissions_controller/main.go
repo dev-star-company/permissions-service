@@ -2,8 +2,9 @@ package role_has_permissions_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/role_has_permissions_proto"
 	"permission-service/internal/app/ent"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/role_has_permissions_proto"
 )
 
 type Controller interface {

@@ -2,8 +2,9 @@ package permission_controller
 
 import (
 	"context"
-	"permission-service/generated_protos/permission_proto"
 	"permission-service/internal/pkg/utils"
+
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/permission_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 )

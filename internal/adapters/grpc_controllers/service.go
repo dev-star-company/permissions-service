@@ -1,7 +1,7 @@
 package grpc_controllers
 
 import (
-	"permission-service/generated_protos/service_proto"
+	"github.com/dev-star-company/protos-go/permission-service/generated_protos/service_proto"
 
 	"permission-service/internal/app/ent"
 )

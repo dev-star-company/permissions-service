@@ -49,12 +49,6 @@ func (c *controller) Update(ctx context.Context, in *users_proto.UpdateRequest) 
 		if err != nil {
 			return nil, err
 		}
-
-		// np := tx.Password.Query().Where(password.IDNotIn(p.ID)).Order(ent.Asc(password.FieldID)).FirstX(ctx)
-		// err = tx.Password.DeleteOneID(np.ID).Exec(ctx)
-		// if err != nil {
-		// 	return nil, utils.Rollback(tx, err)
-		// }
 	}
 
 	user, err := userQ.Save(ctx)

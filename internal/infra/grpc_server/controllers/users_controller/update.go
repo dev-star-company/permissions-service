@@ -3,7 +3,6 @@ package users_controller
 import (
 	"context"
 	"permissions-service/internal/adapters/grpc_controllers"
-	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/password"
 	"permissions-service/internal/pkg/utils"
 	"permissions-service/internal/pkg/utils/hash_password"
@@ -13,7 +12,7 @@ import (
 	"github.com/dev-star-company/service-errors/errs"
 )
 
-func (c *controller) UpdateUser(ctx context.Context, in *users_proto.UpdateRequest) (*users_proto.UpdateResponse, error) {
+func (c *controller) Update(ctx context.Context, in *users_proto.UpdateRequest) (*users_proto.UpdateResponse, error) {
 	if in.RequesterId == 0 {
 		return nil, errs.RequesterIdRequired()
 	}
@@ -35,8 +34,14 @@ func (c *controller) UpdateUser(ctx context.Context, in *users_proto.UpdateReque
 	}
 
 	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
+		_, err := tx.Password.Delete().Where(password.UserIDEQ(int(in.Id))).Exec(ctx)
+		if err != nil {
+			return nil, utils.Rollback(tx, err)
+		}
+
 		hashedPassword, _ := hash_password.Hash(*in.Password)
-		p, err := tx.Password.Create().
+		_, err = tx.Password.Create().
+			SetUserID(int(in.Id)).
 			SetPassword(hashedPassword).
 			SetCreatedBy(int(in.RequesterId)).
 			SetUpdatedBy(int(in.RequesterId)).
@@ -45,16 +50,21 @@ func (c *controller) UpdateUser(ctx context.Context, in *users_proto.UpdateReque
 			return nil, err
 		}
 
-		np := tx.Password.Query().Where(password.IDNotIn(p.ID)).Order(ent.Asc(password.FieldID)).FirstX(ctx)
-		err = tx.Password.DeleteOneID(np.ID).Exec(ctx)
-		if err != nil {
-			return nil, utils.Rollback(tx, err)
-		}
+		// np := tx.Password.Query().Where(password.IDNotIn(p.ID)).Order(ent.Asc(password.FieldID)).FirstX(ctx)
+		// err = tx.Password.DeleteOneID(np.ID).Exec(ctx)
+		// if err != nil {
+		// 	return nil, utils.Rollback(tx, err)
+		// }
 	}
 
 	user, err := userQ.Save(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errs.CommitTransactionError(utils.Rollback(tx, err))
 	}
 
 	// Create and return the response

@@ -9,16 +9,16 @@ require (
 )
 
 require (
-	github.com/dev-star-company/service-errors v0.0.0-20250609153248-6ac414801fbb
+	github.com/dev-star-company/protos-go v0.0.0-20250611174032-442a3af4cbfd
+	github.com/dev-star-company/service-errors v0.0.0-20250610181004-64af6563f4a3
 	google.golang.org/protobuf v1.36.6
 )
 
 require (
-	ariga.io/atlas v0.34.0 // indirect
+	ariga.io/atlas v0.35.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
-	github.com/dev-star-company/protos-go v0.0.0-20250609164818-8a57c315c27e // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect
 	github.com/hashicorp/hcl/v2 v2.23.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect

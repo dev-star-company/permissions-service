@@ -3,14 +3,14 @@ package grpc_controllers
 import (
 	"permissions-service/internal/app/ent"
 
-	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/password_proto"
 )
 
-func PasswordToProto(password *ent.Password) *users_proto.Password {
+func PasswordToProto(password *ent.Password) *password_proto.Password {
 	if password == nil {
 		return nil
 	}
-	p := users_proto.Password{
+	p := password_proto.Password{
 		Id:        uint32(password.ID),
 		Password:  password.Password,
 		CreatedAt: password.CreatedAt.Format("2006-01-02 15:04:05"),

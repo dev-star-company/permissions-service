@@ -3,15 +3,15 @@ package grpc_controllers
 import (
 	"permissions-service/internal/app/ent"
 
-	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/password_proto"
 )
 
-func UserToProto(user *ent.User) *users_proto.User {
+func UserToProto(user *ent.User) *password_proto.User {
 	if user == nil {
 		return nil
 	}
 
-	u := users_proto.User{
+	u := password_proto.User{
 		Id:        uint32(user.ID),
 		Surname:   user.Surname,
 		Name:      user.Name,
@@ -22,14 +22,14 @@ func UserToProto(user *ent.User) *users_proto.User {
 	}
 
 	if len(user.Edges.Emails) != 0 {
-		u.Emails = make([]*users_proto.Email, len(user.Edges.Emails))
+		u.Emails = make([]*password_proto.Email, len(user.Edges.Emails))
 		for i, email := range user.Edges.Emails {
 			u.Emails[i] = EmailToProto(email)
 		}
 	}
 
 	if len(user.Edges.Phones) != 0 {
-		u.Phones = make([]*users_proto.Phone, len(user.Edges.Phones))
+		u.Phones = make([]*password_proto.Phone, len(user.Edges.Phones))
 		for i, phone := range user.Edges.Phones {
 			u.Phones[i] = PhoneToProto(phone)
 		}

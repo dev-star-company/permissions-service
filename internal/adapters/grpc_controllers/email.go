@@ -3,15 +3,15 @@ package grpc_controllers
 import (
 	"permissions-service/internal/app/ent"
 
-	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/password_proto"
 )
 
-func EmailToProto(email *ent.Email) *users_proto.Email {
+func EmailToProto(email *ent.Email) *password_proto.Email {
 	if email == nil {
 		return nil
 	}
 
-	e := users_proto.Email{
+	e := password_proto.Email{
 		Id:        uint32(email.ID),
 		Email:     email.Email,
 		CreatedAt: email.CreatedAt.Format("2006-01-02 15:04:05"),

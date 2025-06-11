@@ -1,4 +1,4 @@
-package users_controller
+package password_controller
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils/hash_password"
 
-	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/users_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/password_proto"
 
 	"github.com/dev-star-company/service-errors/errs"
 
@@ -18,7 +18,7 @@ import (
 )
 
 // TO DO: add soft ban after 3 failed attempts
-func (c *controller) VerifyPassword(ctx context.Context, in *users_proto.VerifyPasswordRequest) (*users_proto.VerifyPasswordResponse, error) {
+func (c *controller) Verify(ctx context.Context, in *password_proto.VerifyRequest) (*password_proto.VerifyResponse, error) {
 	if in.Password == "" {
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
@@ -57,7 +57,7 @@ func (c *controller) VerifyPassword(ctx context.Context, in *users_proto.VerifyP
 		return nil, status.Error(codes.Internal, "internal error on passwords storage")
 	}
 
-	r := users_proto.VerifyPasswordResponse{
+	r := password_proto.VerifyResponse{
 		Success: false,
 	}
 

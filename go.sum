@@ -14,12 +14,10 @@ github.com/bmatcuk/doublestar v1.3.4 h1:gPypJ5xD31uhX6Tf54sDPUOBXTqKH4c9aPY66CyQ
 github.com/bmatcuk/doublestar v1.3.4/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dev-star-company/protos-go v0.0.0-20250611174032-442a3af4cbfd h1:lKYzl9tvz5a5XHhw7H5Z2CHvy519QESS9Q8aORlLrso=
-github.com/dev-star-company/protos-go v0.0.0-20250611174032-442a3af4cbfd/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
-github.com/dev-star-company/service-errors v0.0.0-20250609153248-6ac414801fbb h1:EQkSh0JlB8TyHqzgKQ/ZED/jeqdw1ijE2M3CwpcELVE=
-github.com/dev-star-company/service-errors v0.0.0-20250609153248-6ac414801fbb/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
-github.com/dev-star-company/service-errors v0.0.0-20250610181004-64af6563f4a3 h1:GdPd83DYb5LJxkebl9Arl55g1yANNhMlzZjVj3QSZ6g=
-github.com/dev-star-company/service-errors v0.0.0-20250610181004-64af6563f4a3/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
+github.com/dev-star-company/protos-go v0.0.0-20250612130739-4d8de6b1275d h1:z4Q9eMXE84Mr64s3Lb9iouUS8ZWqaFulsPuSiaQZIxQ=
+github.com/dev-star-company/protos-go v0.0.0-20250612130739-4d8de6b1275d/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
+github.com/dev-star-company/service-errors v0.0.0-20250612124551-50d3e1a1dac2 h1:KsO3xnTK2eyGbqI1ip7yzwSpp8tieZdFr3n7utrWs2E=
+github.com/dev-star-company/service-errors v0.0.0-20250612124551-50d3e1a1dac2/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=
 github.com/go-logr/logr v1.4.2/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=

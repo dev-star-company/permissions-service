@@ -2,6 +2,7 @@ package password_controller
 
 import (
 	"context"
+	"errors"
 	"permissions-service/internal/adapters/grpc_controllers"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/email"
@@ -20,11 +21,11 @@ import (
 // TO DO: add soft ban after 3 failed attempts
 func (c *controller) Verify(ctx context.Context, in *password_proto.VerifyRequest) (*password_proto.VerifyResponse, error) {
 	if in.Password == "" {
-		return nil, status.Error(codes.InvalidArgument, "password is required")
+		return nil, errs.BadRequest(errors.New("password is required"))
 	}
 
 	if in.Id == nil && in.Email == nil && in.Phone == nil {
-		return nil, status.Error(codes.InvalidArgument, "either id, email or phone is required")
+		return nil, errs.BadRequest(errors.New("either id, email or phone is required"))
 	}
 
 	userQ := c.Db.User.Query()
@@ -54,7 +55,7 @@ func (c *controller) Verify(ctx context.Context, in *password_proto.VerifyReques
 		// it's an internal error because if the user has no passwords, they should not be found in the first place
 		// but we are handling it gracefully
 		// and there is a bug in the CRUD process
-		return nil, status.Error(codes.Internal, "internal error on passwords storage")
+		return nil, errs.InternalError(errors.New("user has no passwords or multiple passwords, this is an internal error"))
 	}
 
 	r := password_proto.VerifyResponse{

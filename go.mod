@@ -9,8 +9,8 @@ require (
 )
 
 require (
-	github.com/dev-star-company/protos-go v0.0.0-20250611174032-442a3af4cbfd
-	github.com/dev-star-company/service-errors v0.0.0-20250610181004-64af6563f4a3
+	github.com/dev-star-company/protos-go v0.0.0-20250612130739-4d8de6b1275d
+	github.com/dev-star-company/service-errors v0.0.0-20250612124551-50d3e1a1dac2
 	google.golang.org/protobuf v1.36.6
 )
 

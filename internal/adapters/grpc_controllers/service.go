@@ -6,12 +6,12 @@ import (
 	"permissions-service/internal/app/ent"
 )
 
-func ServiceToProto(service *ent.Services) *service_proto.Service {
+func ServiceToProto(service *ent.Services) *service_proto.ServiceDto {
 	if service == nil {
 		return nil
 	}
 
-	cur := &service_proto.Service{
+	cur := &service_proto.ServiceDto{
 		Id:        uint32(service.ID),
 		Name:      service.Name,
 		CreatedBy: uint32(service.CreatedBy),

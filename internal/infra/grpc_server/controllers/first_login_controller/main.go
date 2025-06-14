@@ -8,7 +8,7 @@ import (
 )
 
 type Controller interface {
-	first_login_proto.FirstLoginServiceServer
+	first_login_proto.ServiceServer
 
 	Create(ctx context.Context, in *first_login_proto.CreateRequest) (*first_login_proto.CreateResponse, error)
 	Get(ctx context.Context, in *first_login_proto.GetRequest) (*first_login_proto.GetResponse, error)
@@ -18,7 +18,7 @@ type Controller interface {
 }
 
 type controller struct {
-	first_login_proto.UnimplementedFirstLoginServiceServer
+	first_login_proto.UnimplementedServiceServer
 
 	Db *ent.Client
 }

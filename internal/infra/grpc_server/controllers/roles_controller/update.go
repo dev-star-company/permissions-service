@@ -12,7 +12,7 @@ import (
 
 func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) (*roles_proto.UpdateResponse, error) {
 	if in.RequesterId == 0 {
-		return nil, errs.RequesterIdRequired()
+		return nil, errs.RequesterIDRequired()
 	}
 
 	tx, err := c.Db.Tx(ctx)

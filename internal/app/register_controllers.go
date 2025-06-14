@@ -24,12 +24,12 @@ import (
 )
 
 func RegisterControllers(grpcServer *grpc.Server, client *ent.Client) {
-	ban_proto.RegisterBanServiceServer(grpcServer, ban_controller.New(client))
-	first_login_proto.RegisterFirstLoginServiceServer(grpcServer, first_login_controller.New(client))
-	login_attempts_proto.RegisterLoginAttemptsServiceServer(grpcServer, login_attempts_controller.New(client))
-	permission_proto.RegisterPermissionServiceServer(grpcServer, permission_controller.New(client))
-	role_has_permissions_proto.RegisterRoleHasPermissionsServiceServer(grpcServer, role_has_permissions_controller.New(client))
-	roles_proto.RegisterRolesServiceServer(grpcServer, roles_controller.New(client))
-	service_proto.RegisterServiceServiceServer(grpcServer, service_controller.New(client))
-	password_proto.RegisterPasswordServiceServer(grpcServer, password_controller.New(client))
+	ban_proto.RegisterServiceServer(grpcServer, ban_controller.New(client))
+	first_login_proto.RegisterServiceServer(grpcServer, first_login_controller.New(client))
+	login_attempts_proto.RegisterServiceServer(grpcServer, login_attempts_controller.New(client))
+	permission_proto.RegisterServiceServer(grpcServer, permission_controller.New(client))
+	role_has_permissions_proto.RegisterServiceServer(grpcServer, role_has_permissions_controller.New(client))
+	roles_proto.RegisterServiceServer(grpcServer, roles_controller.New(client))
+	service_proto.RegisterServiceServer(grpcServer, service_controller.New(client))
+	password_proto.RegisterServiceServer(grpcServer, password_controller.New(client))
 }

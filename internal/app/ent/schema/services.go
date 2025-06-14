@@ -14,7 +14,10 @@ type Services struct {
 // Fields of the Services.
 func (Services) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
+		field.String("name").NotEmpty().Unique(),
+		field.String("description").Optional().NotEmpty(),
+		field.String("internal_name").NotEmpty().Unique(),
+		field.Bool("is_active").Default(true),
 	}
 }
 

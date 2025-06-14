@@ -8,13 +8,13 @@ import (
 )
 
 type Controller interface {
-	password_proto.PasswordServiceServer
+	password_proto.ServiceServer
 
 	Verify(ctx context.Context, in *password_proto.VerifyRequest) (*password_proto.VerifyResponse, error)
 }
 
 type controller struct {
-	password_proto.UnimplementedPasswordServiceServer
+	password_proto.UnimplementedServiceServer
 
 	Db *ent.Client
 }

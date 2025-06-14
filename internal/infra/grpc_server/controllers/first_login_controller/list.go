@@ -43,15 +43,15 @@ func (c *controller) List(ctx context.Context, in *first_login_proto.ListRequest
 		query = query.Offset(int(*in.Offset))
 	}
 
-	if in.Orderby != nil {
-		if in.Orderby.Id != nil {
-			switch *in.Orderby.Id {
+	if in.OrderBy != nil {
+		if in.OrderBy.Id != nil {
+			switch *in.OrderBy.Id {
 			case "ASC":
 				query = query.Order(ent.Asc(firstlogin.FieldID))
 			case "DESC":
 				query = query.Order(ent.Desc(firstlogin.FieldID))
 			default:
-				return nil, errs.InvalidOrderByValue(errors.New(*in.Orderby.Id))
+				return nil, errs.InvalidOrderByValue(errors.New(*in.OrderBy.Id))
 			}
 		}
 	}

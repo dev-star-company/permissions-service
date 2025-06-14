@@ -12,7 +12,7 @@ import (
 
 func (c *controller) Delete(ctx context.Context, in *roles_proto.DeleteRequest) (*roles_proto.DeleteResponse, error) {
 	if in.RequesterId == 0 {
-		return nil, errs.RequesterIdRequired()
+		return nil, errs.RequesterIDRequired()
 	}
 
 	tx, err := c.Db.Tx(ctx)

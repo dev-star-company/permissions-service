@@ -12,7 +12,7 @@ import (
 func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.CreateRequest) (*role_has_permissions_proto.CreateResponse, error) {
 
 	if in.RequesterId == 0 {
-		return nil, errs.RequesterIdRequired()
+		return nil, errs.RequesterIDRequired()
 	}
 
 	tx, err := c.Db.Tx(ctx)

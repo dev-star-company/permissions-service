@@ -47,15 +47,15 @@ func (c *controller) List(ctx context.Context, in *login_attempts_proto.ListRequ
 		query = query.Offset(int(*in.Offset))
 	}
 
-	if in.Orderby != nil {
-		if in.Orderby.Id != nil {
-			switch *in.Orderby.Id {
+	if in.OrderBy != nil {
+		if in.OrderBy.Id != nil {
+			switch *in.OrderBy.Id {
 			case "ASC":
 				query = query.Order(ent.Asc(loginattempts.FieldID))
 			case "DESC":
 				query = query.Order(ent.Desc(loginattempts.FieldID))
 			default:
-				return nil, errs.InvalidOrderByValue(errors.New(*in.Orderby.Id))
+				return nil, errs.InvalidOrderByValue(errors.New(*in.OrderBy.Id))
 			}
 		}
 	}

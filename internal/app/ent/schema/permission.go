@@ -17,8 +17,8 @@ func (Permission) Fields() []ent.Field {
 		field.Int("service_id"),
 		field.String("name").NotEmpty().Unique(),
 		field.String("description").Optional().NotEmpty(),
-		field.Bool("is_active").Default(true),
 		field.String("internal_name").NotEmpty().Unique(),
+		field.Bool("is_active").Default(true),
 	}
 }
 

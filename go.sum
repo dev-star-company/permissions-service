@@ -14,8 +14,8 @@ github.com/bmatcuk/doublestar v1.3.4 h1:gPypJ5xD31uhX6Tf54sDPUOBXTqKH4c9aPY66CyQ
 github.com/bmatcuk/doublestar v1.3.4/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dev-star-company/protos-go v0.0.0-20250614164228-2f422246a415 h1:5ujiLYuOXHwjGNNKLXzFilcVRRMCMy9INK7aDoLFe64=
-github.com/dev-star-company/protos-go v0.0.0-20250614164228-2f422246a415/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
+github.com/dev-star-company/protos-go v0.0.0-20250616192110-625eb2429872 h1:tKUVuVT7KD/ngibKoDcugsqDJP4tbDdGgFWsb8qhQoY=
+github.com/dev-star-company/protos-go v0.0.0-20250616192110-625eb2429872/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
 github.com/dev-star-company/service-errors v0.0.0-20250614153158-1e7d0fcbea66 h1:eI/2l8EO/ZERr8iqqt60m7pKlZfRsBgntgjcoDTlkKM=
 github.com/dev-star-company/service-errors v0.0.0-20250614153158-1e7d0fcbea66/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=

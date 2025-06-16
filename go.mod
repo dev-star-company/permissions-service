@@ -4,13 +4,9 @@ go 1.24.1
 
 require (
 	entgo.io/ent v0.14.4
+	github.com/dev-star-company/service-errors v0.0.0-20250614153158-1e7d0fcbea66
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/grpc v1.73.0
-)
-
-require (
-	github.com/dev-star-company/protos-go v0.0.0-20250614164228-2f422246a415
-	github.com/dev-star-company/service-errors v0.0.0-20250614153158-1e7d0fcbea66
 	google.golang.org/protobuf v1.36.6
 )
 
@@ -19,6 +15,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
+	github.com/dev-star-company/protos-go v0.0.0-20250616192110-625eb2429872 // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect
 	github.com/hashicorp/hcl/v2 v2.23.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect

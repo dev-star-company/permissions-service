@@ -3,7 +3,7 @@ package roles_controller
 import (
 	"context"
 	"fmt"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
 
@@ -37,6 +37,6 @@ func (c *controller) Create(ctx context.Context, in *roles_proto.CreateRequest) 
 	}
 
 	return &roles_proto.CreateResponse{
-		Role: grpc_controllers.RoleToProto(role),
+		Role: grpc_convertions.RoleToProto(role),
 	}, nil
 }

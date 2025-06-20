@@ -26,7 +26,7 @@ func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.
 		Save(ctx)
 
 	if err != nil {
-		return nil, errs.CreateError("product type", err)
+		return nil, errs.CreateError("role_has_permissions", err)
 	}
 
 	if err := tx.Commit(); err != nil {

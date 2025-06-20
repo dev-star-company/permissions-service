@@ -3,7 +3,7 @@ package role_has_permissions_controller
 import (
 	"context"
 	"errors"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/rolehaspermissions"
 	"permissions-service/internal/app/ent/schema"
@@ -59,7 +59,7 @@ func (c *controller) List(ctx context.Context, in *role_has_permissions_proto.Li
 
 	responseRoleHasPermissions := make([]*role_has_permissions_proto.RoleHasPermissions, len(role_has_permissions))
 	for i, acc := range role_has_permissions {
-		responseRoleHasPermissions[i] = grpc_controllers.RoleHasPermissionsToProto(acc)
+		responseRoleHasPermissions[i] = grpc_convertions.RoleHasPermissionsToProto(acc)
 	}
 
 	if err := tx.Commit(); err != nil {

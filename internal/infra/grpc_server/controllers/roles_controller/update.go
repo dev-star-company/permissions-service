@@ -2,7 +2,7 @@ package roles_controller
 
 import (
 	"context"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
@@ -42,6 +42,6 @@ func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) 
 	}
 
 	return &roles_proto.UpdateResponse{
-		Role: grpc_controllers.RoleToProto(role),
+		Role: grpc_convertions.RoleToProto(role),
 	}, nil
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Controller interface {
-	ban_proto.ServiceServer
+	ban_proto.BanServiceServer
 
 	Create(ctx context.Context, in *ban_proto.CreateRequest) (*ban_proto.CreateResponse, error)
 	Get(ctx context.Context, in *ban_proto.GetRequest) (*ban_proto.GetResponse, error)
@@ -18,7 +18,7 @@ type Controller interface {
 }
 
 type controller struct {
-	ban_proto.UnimplementedServiceServer
+	ban_proto.UnimplementedBanServiceServer
 
 	Db *ent.Client
 }

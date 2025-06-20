@@ -2,7 +2,7 @@ package roles_controller
 
 import (
 	"context"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent/schema"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
@@ -34,7 +34,7 @@ func (c *controller) List(ct context.Context, in *roles_proto.ListRequest) (*rol
 	}
 
 	for i, role := range roles {
-		response.Rows[i] = grpc_controllers.RoleToProto(role)
+		response.Rows[i] = grpc_convertions.RoleToProto(role)
 	}
 
 	return response, nil

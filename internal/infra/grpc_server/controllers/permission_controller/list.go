@@ -3,7 +3,7 @@ package permission_controller
 import (
 	"context"
 	"errors"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/permission"
 	"permissions-service/internal/app/ent/schema"
@@ -63,7 +63,7 @@ func (c *controller) List(ctx context.Context, in *permission_proto.ListRequest)
 
 	responsePermission := make([]*permission_proto.Permission, len(permission))
 	for i, acc := range permission {
-		responsePermission[i] = grpc_controllers.PermissionToProto(acc)
+		responsePermission[i] = grpc_convertions.PermissionToProto(acc)
 	}
 
 	if err := tx.Commit(); err != nil {

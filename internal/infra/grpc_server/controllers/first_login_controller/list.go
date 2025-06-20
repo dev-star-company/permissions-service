@@ -3,7 +3,7 @@ package first_login_controller
 import (
 	"context"
 	"errors"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/firstlogin"
 	"permissions-service/internal/app/ent/schema"
@@ -63,7 +63,7 @@ func (c *controller) List(ctx context.Context, in *first_login_proto.ListRequest
 
 	responseFirstLogin := make([]*first_login_proto.FirstLogin, len(first_login))
 	for i, acc := range first_login {
-		responseFirstLogin[i] = grpc_controllers.FirstLoginToProto(acc)
+		responseFirstLogin[i] = grpc_convertions.FirstLoginToProto(acc)
 	}
 
 	if err := tx.Commit(); err != nil {

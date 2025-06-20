@@ -3,7 +3,7 @@ package service_controller
 import (
 	"context"
 	"errors"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/schema"
 	"permissions-service/internal/app/ent/services"
@@ -63,7 +63,7 @@ func (c *controller) List(ctx context.Context, in *service_proto.ListRequest) (*
 
 	responseService := make([]*service_proto.ServiceDto, len(service))
 	for i, acc := range service {
-		responseService[i] = grpc_controllers.ServiceToProto(acc)
+		responseService[i] = grpc_convertions.ServiceToProto(acc)
 	}
 
 	if err := tx.Commit(); err != nil {

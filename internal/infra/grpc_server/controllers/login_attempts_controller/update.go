@@ -28,7 +28,7 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 		login_attemptsQ.SetUserID(int(*in.UserId))
 	}
 
-	if in.Successful != nil && *in.Successful {
+	if in.Successful != nil {
 		login_attemptsQ.SetSuccessful(bool(*in.Successful))
 	}
 

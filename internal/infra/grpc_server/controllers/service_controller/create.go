@@ -27,7 +27,7 @@ func (c *controller) Create(ctx context.Context, in *service_proto.CreateRequest
 		Save(ctx)
 
 	if err != nil {
-		return nil, errs.CreateError("product type", err)
+		return nil, errs.CreateError("service", err)
 	}
 
 	if err := tx.Commit(); err != nil {

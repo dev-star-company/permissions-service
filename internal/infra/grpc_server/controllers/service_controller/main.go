@@ -8,7 +8,7 @@ import (
 )
 
 type Controller interface {
-	service_proto.ServiceServer
+	service_proto.ServiceServiceServer
 
 	Create(ctx context.Context, in *service_proto.CreateRequest) (*service_proto.CreateResponse, error)
 	Get(ctx context.Context, in *service_proto.GetRequest) (*service_proto.GetResponse, error)
@@ -18,7 +18,7 @@ type Controller interface {
 }
 
 type controller struct {
-	service_proto.UnimplementedServiceServer
+	service_proto.UnimplementedServiceServiceServer
 
 	Db *ent.Client
 }

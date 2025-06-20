@@ -3,7 +3,7 @@ package roles_controller
 import (
 	"context"
 	"fmt"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/role"
 
@@ -26,6 +26,6 @@ func (c *controller) Get(ctx context.Context, in *roles_proto.GetRequest) (*role
 	}
 
 	return &roles_proto.GetResponse{
-		Role: grpc_controllers.RoleToProto(role),
+		Role: grpc_convertions.RoleToProto(role),
 	}, nil
 }

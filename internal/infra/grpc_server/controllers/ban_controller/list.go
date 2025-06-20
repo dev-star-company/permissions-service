@@ -3,7 +3,7 @@ package ban_controller
 import (
 	"context"
 	"errors"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/ban"
 	"permissions-service/internal/app/ent/schema"
@@ -68,7 +68,7 @@ func (c *controller) List(ctx context.Context, in *ban_proto.ListRequest) (*ban_
 
 	responseBan := make([]*ban_proto.Ban, len(ban))
 	for i, acc := range ban {
-		responseBan[i] = grpc_controllers.BanToProto(acc)
+		responseBan[i] = grpc_convertions.BanToProto(acc)
 	}
 
 	if err := tx.Commit(); err != nil {

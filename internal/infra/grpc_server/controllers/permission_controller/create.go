@@ -27,7 +27,7 @@ func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequ
 		Save(ctx)
 
 	if err != nil {
-		return nil, errs.CreateError("product type", err)
+		return nil, errs.CreateError("permission", err)
 	}
 
 	if err := tx.Commit(); err != nil {

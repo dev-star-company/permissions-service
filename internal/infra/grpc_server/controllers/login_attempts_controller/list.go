@@ -3,7 +3,7 @@ package login_attempts_controller
 import (
 	"context"
 	"errors"
-	"permissions-service/internal/adapters/grpc_controllers"
+	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/loginattempts"
 	"permissions-service/internal/app/ent/schema"
@@ -67,7 +67,7 @@ func (c *controller) List(ctx context.Context, in *login_attempts_proto.ListRequ
 
 	responseLoginAttempts := make([]*login_attempts_proto.LoginAttempts, len(login_attempts))
 	for i, acc := range login_attempts {
-		responseLoginAttempts[i] = grpc_controllers.LoginAttemptsToProto(acc)
+		responseLoginAttempts[i] = grpc_convertions.LoginAttemptsToProto(acc)
 	}
 
 	if err := tx.Commit(); err != nil {

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Email holds the schema definition for the Email entity.
@@ -21,6 +22,7 @@ type Email struct {
 // Fields of the Email.
 func (Email) Fields() []ent.Field {
 	return []ent.Field{
+		field.UUID("uuid", uuid.New()).Default(uuid.New).Unique(),
 		field.String("email").NotEmpty().Unique(),
 		field.Int("user_id"),
 		field.Bool("main").Default(false),

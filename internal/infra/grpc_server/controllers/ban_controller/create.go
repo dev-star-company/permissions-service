@@ -26,7 +26,7 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 		Save(ctx)
 
 	if err != nil {
-		return nil, errs.CreateError("product type", err)
+		return nil, errs.CreateError("ban", err)
 	}
 
 	if err := tx.Commit(); err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"permissions-service/internal/config/env"
 
+	"github.com/dev-star-company/kafka-go/actions"
 	"github.com/dev-star-company/kafka-go/topics"
 )
 
@@ -21,7 +22,23 @@ func (k *kafka) SyncUsers() {
 
 	for {
 		switch msg := <-incomingUsers; msg.Action {
-		case "create":
+		case actions.CREATE:
+			err := k.UsersKafka.CreateUser(msg.Payload)
+			if err != nil {
+				fmt.Println("error creating user: " + err.Error())
+			}
+		case actions.UPDATE:
+			err := k.UsersKafka.UpdateUser(msg.Payload)
+			if err != nil {
+				fmt.Println("error updating user: " + err.Error())
+			}
+		case actions.DELETE:
+			err := k.UsersKafka.DeleteUser(msg.Payload)
+			if err != nil {
+				fmt.Println("error deleting user: " + err.Error())
+			}
+		default:
+			fmt.Println("unknown action: " + msg.Action)
 		}
 	}
 }

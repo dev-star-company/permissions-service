@@ -28,7 +28,7 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 		Save(ctx)
 
 	if err != nil {
-		return nil, errs.CreateError("product type", err)
+		return nil, errs.CreateError("login_attempts", err)
 	}
 
 	if err := tx.Commit(); err != nil {

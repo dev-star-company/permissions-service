@@ -1,6 +1,12 @@
 package schema
 
 import (
+	"context"
+	"permissions-service/internal/app/ent/hook"
+	"strings"
+
+	gen "permissions-service/internal/app/ent"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -34,21 +40,21 @@ func (Role) Edges() []ent.Edge {
 	}
 }
 
-// func (Role) Hooks() []ent.Hook {
-// 	return []ent.Hook{
-// 		// First hook.
-// 		hook.On(
-// 			func(next ent.Mutator) ent.Mutator {
-// 				return hook.RoleFunc(func(ctx context.Context, m *gen.RoleMutation) (ent.Value, error) {
-// 					if name, exists := m.Name(); exists {
-// 						m.SetName(strings.ToLower(name))
-// 					}
+func (Role) Hooks() []ent.Hook {
+	return []ent.Hook{
+		// First hook.
+		hook.On(
+			func(next ent.Mutator) ent.Mutator {
+				return hook.RoleFunc(func(ctx context.Context, m *gen.RoleMutation) (ent.Value, error) {
+					if name, exists := m.Name(); exists {
+						m.SetName(strings.ToLower(name))
+					}
 
-// 					return next.Mutate(ctx, m)
-// 				})
-// 			},
-// 			// Limit the hook only for these operations.
-// 			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
-// 		),
-// 	}
-// }
+					return next.Mutate(ctx, m)
+				})
+			},
+			// Limit the hook only for these operations.
+			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
+		),
+	}
+}

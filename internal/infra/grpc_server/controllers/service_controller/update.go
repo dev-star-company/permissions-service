@@ -12,7 +12,7 @@ import (
 
 func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest) (*service_proto.UpdateResponse, error) {
 	if in.RequesterId == 0 {
-		return nil, errs.ServiceNotFound(int(in.Id))
+		return nil, errs.RequesterIDRequired()
 	}
 
 	tx, err := c.Db.Tx(ctx)

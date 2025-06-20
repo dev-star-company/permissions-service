@@ -2,24 +2,18 @@ package users_kafka
 
 import (
 	"context"
-	"permissions-service/internal/app/ent"
+	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
 
-type UserKafka struct {
-	db *ent.Client
-}
-
-func (c *UserKafka) SyncUser(user connection.SyncUserStruct) {
+func (c *usersKafka) CreateUser(user connection.SyncUserStruct) error {
 	tx, err := c.db.Tx(context.Background())
 	if err != nil {
-		// Handle transaction start error
-		return
+		return err
 	}
 
 	_, err = tx.User.Create().
-		SetId(user.ID).
 		SetName(*user.Name).
 		SetSurname(*user.Surname).
 		SetCreatedBy(int(*user.CreatedBy)).
@@ -29,15 +23,13 @@ func (c *UserKafka) SyncUser(user connection.SyncUserStruct) {
 		Save(context.Background())
 
 	if err != nil {
-		// Handle create error
-		return
+		return utils.Rollback(tx, err)
 	}
 
 	if err := tx.Commit(); err != nil {
-		// Handle commit error
-		return
+		return err
 	}
 
-	// Successfully created user
-
+	// Successfully created user, return nil error
+	return nil
 }

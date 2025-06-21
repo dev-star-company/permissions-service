@@ -8,7 +8,7 @@ import (
 
 func ToKafkaUser(user ent.User) connection.SyncUserStruct {
 	return connection.SyncUserStruct{
-		ID:        user.ID,
+		Uuid:      user.UUID,
 		Name:      &user.Name,
 		Surname:   &user.Surname,
 		CreatedAt: &user.CreatedAt,

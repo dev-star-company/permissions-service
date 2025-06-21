@@ -8,7 +8,7 @@ import (
 
 func ToKafkaEmail(email ent.Email) connection.SyncEmailStruct {
 	return connection.SyncEmailStruct{
-		ID:        email.ID,
+		Uuid:      email.UUID,
 		Email:     &email.Email,
 		CreatedAt: &email.CreatedAt,
 		UpdatedAt: &email.UpdatedAt,

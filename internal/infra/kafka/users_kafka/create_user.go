@@ -14,6 +14,7 @@ func (c *usersKafka) CreateUser(user connection.SyncUserStruct) error {
 	}
 
 	_, err = tx.User.Create().
+		SetUUID(user.Uuid).
 		SetName(*user.Name).
 		SetSurname(*user.Surname).
 		SetCreatedBy(int(*user.CreatedBy)).

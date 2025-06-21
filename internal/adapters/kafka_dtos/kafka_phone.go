@@ -8,7 +8,7 @@ import (
 
 func ToKafkaPhone(phone ent.Phone) connection.SyncPhoneStruct {
 	return connection.SyncPhoneStruct{
-		ID:        phone.ID,
+		Uuid:      phone.UUID,
 		Phone:     &phone.Phone,
 		CreatedAt: &phone.CreatedAt,
 		UpdatedAt: &phone.UpdatedAt,

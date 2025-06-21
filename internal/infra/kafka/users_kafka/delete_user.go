@@ -2,18 +2,19 @@ package users_kafka
 
 import (
 	"context"
+	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
 
-func (c *usersKafka) DeleteUser(user connection.SyncUserStruct) error {
+func (c *usersKafka) DeleteUser(u connection.SyncUserStruct) error {
 	tx, err := c.db.Tx(context.Background())
 	if err != nil {
 		return err
 	}
 
-	err = tx.User.DeleteOneID(int(user.ID)).Exec(context.Background())
+	_, err = tx.User.Delete().Where(user.UUIDEQ(u.Uuid)).Exec(context.Background())
 	if err != nil {
 		return utils.Rollback(tx, err)
 	}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils"
-	"permissions-service/internal/pkg/utils/parser"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
@@ -30,7 +29,7 @@ func (c *usersKafka) CreateUser(u connection.SyncUserStruct) error {
 			SetName(*u.Name).
 			SetSurname(*u.Surname).
 			SetUpdatedBy(int(*u.UpdatedBy)).
-			SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt)).
+			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	} else {
 		_, err = tx.User.Create().
@@ -38,9 +37,9 @@ func (c *usersKafka) CreateUser(u connection.SyncUserStruct) error {
 			SetName(*u.Name).
 			SetSurname(*u.Surname).
 			SetCreatedBy(int(*u.CreatedBy)).
-			SetCreatedAt(*parser.ParseTimeTime(u.CreatedAt)).
+			SetCreatedAt(*u.CreatedAt).
 			SetUpdatedBy(int(*u.UpdatedBy)).
-			SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt)).
+			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	}
 

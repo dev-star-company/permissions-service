@@ -7,7 +7,6 @@ import (
 	"permissions-service/internal/app/ent/phone"
 	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils"
-	"permissions-service/internal/pkg/utils/parser"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
@@ -40,15 +39,15 @@ func (c *phonesKafka) CreatePhone(u connection.SyncPhoneStruct) error {
 		_, err = tx.Phone.
 			UpdateOne(phoneExists).
 			SetUpdatedBy(int(*u.UpdatedBy)).
-			SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt)).
+			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	} else {
 		_, err = tx.Phone.Create().
 			SetUUID(u.Uuid).
 			SetCreatedBy(int(*u.CreatedBy)).
-			SetCreatedAt(*parser.ParseTimeTime(u.CreatedAt)).
+			SetCreatedAt(*u.CreatedAt).
 			SetUpdatedBy(int(*u.UpdatedBy)).
-			SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt)).
+			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	}
 

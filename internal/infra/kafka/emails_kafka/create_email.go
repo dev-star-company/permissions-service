@@ -7,7 +7,6 @@ import (
 	"permissions-service/internal/app/ent/email"
 	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils"
-	"permissions-service/internal/pkg/utils/parser"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
@@ -40,15 +39,15 @@ func (c *emailsKafka) CreateEmail(u connection.SyncEmailStruct) error {
 		_, err = tx.Email.
 			UpdateOne(emailExists).
 			SetUpdatedBy(int(*u.UpdatedBy)).
-			SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt)).
+			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	} else {
 		_, err = tx.Email.Create().
 			SetUUID(u.Uuid).
 			SetCreatedBy(int(*u.CreatedBy)).
-			SetCreatedAt(*parser.ParseTimeTime(u.CreatedAt)).
+			SetCreatedAt(*u.CreatedAt).
 			SetUpdatedBy(int(*u.UpdatedBy)).
-			SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt)).
+			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	}
 

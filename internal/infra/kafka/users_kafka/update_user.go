@@ -4,7 +4,6 @@ import (
 	"context"
 	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils"
-	"permissions-service/internal/pkg/utils/parser"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
@@ -27,7 +26,7 @@ func (c *usersKafka) UpdateUser(u connection.SyncUserStruct) error {
 		query = query.SetUpdatedBy(int(*u.UpdatedBy))
 	}
 	if u.UpdatedAt != nil {
-		query = query.SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt))
+		query = query.SetUpdatedAt(*u.UpdatedAt)
 	}
 	_, err = query.Save(context.Background())
 

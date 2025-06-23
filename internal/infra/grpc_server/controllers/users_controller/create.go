@@ -7,6 +7,8 @@ import (
 	"permissions-service/internal/adapters/kafka_dtos"
 	"permissions-service/internal/app/ent/email"
 	"permissions-service/internal/app/ent/phone"
+	"permissions-service/internal/config/env"
+	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/kafka-go/actions"
 	"github.com/dev-star-company/kafka-go/connection"
@@ -23,6 +25,8 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	if err != nil {
 		return nil, fmt.Errorf("starting a transaction: %w", err)
 	}
+
+	defer tx.Rollback()
 
 	// Create a new user in the database
 	user, err := tx.User.Create().
@@ -81,33 +85,44 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 		return nil, err
 	}
 
-	// Commit the transaction
-	if err := tx.Commit(); err != nil {
-		tx.Rollback()
-		return nil, fmt.Errorf("committing transaction: %w", err)
-	}
-
 	user.Edges.Emails = append(user.Edges.Emails, email)
 	user.Edges.Passwords = append(user.Edges.Passwords, password)
 	user.Edges.Phones = append(user.Edges.Phones, phone)
 
 	userToSync := connection.Message[connection.SyncUserStruct]{
-		Action:  actions.CREATE,
-		Payload: kafka_dtos.ToKafkaUser(*user),
+		Action:    actions.CREATE,
+		Payload:   kafka_dtos.ToKafkaUser(*user),
+		Publisher: env.KAFKA_CONSUMER_GROUP,
 	}
-	c.k.PublishToSyncUsers(userToSync)
+	err = c.k.PublishToSyncUsers(userToSync)
+	if err != nil {
+		return nil, fmt.Errorf("publishing user to sync: %w", err)
+	}
 
 	emailToSync := connection.Message[connection.SyncEmailStruct]{
-		Action:  actions.CREATE,
-		Payload: kafka_dtos.ToKafkaEmail(*email),
+		Action:    actions.CREATE,
+		Payload:   kafka_dtos.ToKafkaEmail(*email, *user),
+		Publisher: env.KAFKA_CONSUMER_GROUP,
 	}
-	c.k.PublishToSyncEmails(emailToSync)
+	err = c.k.PublishToSyncEmails(emailToSync)
+	if err != nil {
+		return nil, fmt.Errorf("publishing email to sync: %w", err)
+	}
 
 	phoneToSync := connection.Message[connection.SyncPhoneStruct]{
-		Action:  actions.CREATE,
-		Payload: kafka_dtos.ToKafkaPhone(*phone),
+		Action:    actions.CREATE,
+		Payload:   kafka_dtos.ToKafkaPhone(*phone, *user),
+		Publisher: env.KAFKA_CONSUMER_GROUP,
 	}
-	c.k.PublishToSyncPhones(phoneToSync)
+	err = c.k.PublishToSyncPhones(phoneToSync)
+	if err != nil {
+		return nil, fmt.Errorf("publishing phone to sync: %w", err)
+	}
+
+	// Commit the transaction
+	if err := tx.Commit(); err != nil {
+		return nil, utils.Rollback(tx, fmt.Errorf("committing transaction: %w", err))
+	}
 
 	return &auth_users_proto.CreateResponse{
 		User: grpc_convertions.UserToProto(user),

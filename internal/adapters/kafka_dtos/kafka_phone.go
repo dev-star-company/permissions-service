@@ -6,16 +6,17 @@ import (
 	"github.com/dev-star-company/kafka-go/connection"
 )
 
-func ToKafkaPhone(phone ent.Phone) connection.SyncPhoneStruct {
+func ToKafkaPhone(phone ent.Phone, user ent.User) connection.SyncPhoneStruct {
 	return connection.SyncPhoneStruct{
 		Uuid:      phone.UUID,
+		UserUuid:  user.UUID,
 		Phone:     &phone.Phone,
 		CreatedAt: &phone.CreatedAt,
 		UpdatedAt: &phone.UpdatedAt,
-		DeletedAt: phone.DeletedAt, // This can be nil, so no need for pointer
+		DeletedAt: phone.DeletedAt,
 		CreatedBy: &phone.CreatedBy,
 		UpdatedBy: &phone.UpdatedBy,
-		DeletedBy: phone.DeletedBy, // This can be nil, so no need for pointer
+		DeletedBy: phone.DeletedBy,
 		Main:      &phone.Main,
 	}
 }

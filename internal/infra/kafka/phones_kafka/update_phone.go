@@ -7,6 +7,7 @@ import (
 	"permissions-service/internal/app/ent/phone"
 	"permissions-service/internal/app/ent/user"
 	"permissions-service/internal/pkg/utils"
+	"permissions-service/internal/pkg/utils/parser"
 
 	"github.com/dev-star-company/kafka-go/connection"
 )
@@ -32,7 +33,7 @@ func (c *phonesKafka) UpdatePhone(u connection.SyncPhoneStruct) error {
 		query = query.SetUpdatedBy(int(*u.UpdatedBy))
 	}
 	if u.UpdatedAt != nil {
-		query = query.SetUpdatedAt(*u.UpdatedAt)
+		query = query.SetUpdatedAt(*parser.ParseTimeTime(u.UpdatedAt))
 	}
 	_, err = query.Save(context.Background())
 

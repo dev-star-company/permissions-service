@@ -13,9 +13,9 @@ func ToKafkaUser(user ent.User) connection.SyncUserStruct {
 		Surname:   &user.Surname,
 		CreatedAt: &user.CreatedAt,
 		UpdatedAt: &user.UpdatedAt,
-		DeletedAt: user.DeletedAt, // This can be nil, so no need for pointer
+		DeletedAt: user.DeletedAt,
 		CreatedBy: &user.CreatedBy,
 		UpdatedBy: &user.UpdatedBy,
-		DeletedBy: user.DeletedBy, // This can be nil, so no need for pointer
+		DeletedBy: user.DeletedBy,
 	}
 }

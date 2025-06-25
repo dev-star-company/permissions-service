@@ -1,4 +1,4 @@
-package users_controller
+package auth_users_controller
 
 import (
 	"context"

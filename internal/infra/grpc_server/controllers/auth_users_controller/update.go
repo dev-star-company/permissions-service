@@ -1,11 +1,11 @@
-package users_controller
+package auth_users_controller
 
 import (
 	"context"
-	"fmt"
 	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/password"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
@@ -14,15 +14,21 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequest) (*auth_users_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
+		return nil, errs.StartTransactionError(err)
 	}
 
+	defer tx.Rollback()
+
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
 	// Update the user in the database
 	userQ := tx.User.UpdateOneID(int(in.Id))
 
@@ -37,8 +43,8 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
 		p, err := tx.Password.Create().
 			SetPassword(*in.Password).
-			SetCreatedBy(int(in.RequesterId)).
-			SetUpdatedBy(int(in.RequesterId)).
+			SetCreatedBy(requesterId).
+			SetUpdatedBy(requesterId).
 			Save(ctx)
 		if err != nil {
 			return nil, err

@@ -11,7 +11,7 @@ import (
 )
 
 func (c *controller) Get(ctx context.Context, in *role_has_permissions_proto.GetRequest) (*role_has_permissions_proto.GetResponse, error) {
-	role_has_permissions, err := c.Db.RoleHasPermissions.
+	_, err := c.Db.RoleHasPermissions.
 		Query().
 		Where(rolehaspermissions.RoleID(int(in.Id))).
 		Only(ctx)
@@ -21,6 +21,6 @@ func (c *controller) Get(ctx context.Context, in *role_has_permissions_proto.Get
 	}
 
 	return &role_has_permissions_proto.GetResponse{
-		RequesterId: uint32(role_has_permissions.CreatedBy),
+		RequesterUuid: in.RequesterUuid,
 	}, nil
 }

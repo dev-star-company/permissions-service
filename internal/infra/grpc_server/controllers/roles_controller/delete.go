@@ -11,7 +11,7 @@ import (
 )
 
 func (c *controller) Delete(ctx context.Context, in *roles_proto.DeleteRequest) (*roles_proto.DeleteResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 

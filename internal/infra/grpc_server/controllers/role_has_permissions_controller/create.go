@@ -2,6 +2,7 @@ package role_has_permissions_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/role_has_permissions_proto"
@@ -11,7 +12,7 @@ import (
 
 func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.CreateRequest) (*role_has_permissions_proto.CreateResponse, error) {
 
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,9 +21,14 @@ func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.
 		return nil, errs.StartTransactionError(err)
 	}
 
-	create, err := c.Db.RoleHasPermissions.Create().
-		SetCreatedBy(int(in.RequesterId)).
-		SetUpdatedBy(int(in.RequesterId)).
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = c.Db.RoleHasPermissions.Create().
+		SetCreatedBy(requesterId).
+		SetUpdatedBy(requesterId).
 		Save(ctx)
 
 	if err != nil {
@@ -34,6 +40,6 @@ func (c *controller) Create(ctx context.Context, in *role_has_permissions_proto.
 	}
 
 	return &role_has_permissions_proto.CreateResponse{
-		RequesterId: uint32(create.CreatedBy),
+		RequesterUuid: in.RequesterUuid,
 	}, nil
 }

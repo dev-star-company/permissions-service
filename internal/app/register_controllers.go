@@ -2,6 +2,7 @@ package app
 
 import (
 	"permissions-service/internal/app/ent"
+	"permissions-service/internal/infra/grpc_server/controllers/auth_users_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/ban_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/first_login_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/login_attempts_controller"
@@ -31,5 +32,5 @@ func RegisterControllers(grpcServer *grpc.Server, client *ent.Client, k *connect
 	role_has_permissions_proto.RegisterRoleHasPermissionServiceServer(grpcServer, role_has_permissions_controller.New(client))
 	roles_proto.RegisterRoleServiceServer(grpcServer, roles_controller.New(client))
 	service_proto.RegisterServiceServiceServer(grpcServer, service_controller.New(client))
-	auth_users_proto.RegisterAuthUsersServiceServer(grpcServer, users_controller.New(client, k))
+	auth_users_proto.RegisterAuthUsersServiceServer(grpcServer, auth_users_controller.New(client, k))
 }

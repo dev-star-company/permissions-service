@@ -21,7 +21,7 @@ func (c *controller) Get(ctx context.Context, in *service_proto.GetRequest) (*se
 	}
 
 	return &service_proto.GetResponse{
-		RequesterId: uint32(service.CreatedBy),
-		Name:        service.Name,
+		RequesterUuid: in.RequesterUuid,
+		Name:          service.Name,
 	}, nil
 }

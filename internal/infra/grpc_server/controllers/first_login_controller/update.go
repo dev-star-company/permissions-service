@@ -3,6 +3,7 @@ package first_login_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/first_login_proto"
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateRequest) (*first_login_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.FirstLoginNotFound(int(in.Id))
 	}
 
@@ -20,7 +21,10 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 		return nil, errs.StartTransactionError(err)
 	}
 
-	var first_login *ent.FirstLogin
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
 
 	first_loginQ := tx.FirstLogin.UpdateOneID(int(in.Id))
 
@@ -28,9 +32,9 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 		first_loginQ.SetUserID(int(*in.UserId))
 	}
 
-	first_loginQ.SetUpdatedBy(int(in.RequesterId))
+	first_loginQ.SetUpdatedBy(requesterId)
 
-	first_login, err = first_loginQ.Save(ctx)
+	first_login, err := first_loginQ.Save(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, utils.Rollback(tx, errs.FirstLoginNotFound(int(in.Id)))
@@ -46,7 +50,7 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 	}
 
 	return &first_login_proto.UpdateResponse{
-		RequesterId: uint32(first_login.CreatedBy),
-		UserId:      uint32(*first_login.UserID),
+		RequesterUuid: in.RequesterUuid,
+		UserId:        uint32(*first_login.UserID),
 	}, nil
 }

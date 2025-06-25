@@ -2,6 +2,7 @@ package permission_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/permission_proto"
@@ -11,7 +12,7 @@ import (
 
 func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequest) (*permission_proto.CreateResponse, error) {
 
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,10 +21,15 @@ func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequ
 		return nil, errs.StartTransactionError(err)
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	create, err := c.Db.Permission.Create().
 		SetName(in.Name).
-		SetCreatedBy(int(in.RequesterId)).
-		SetUpdatedBy(int(in.RequesterId)).
+		SetCreatedBy(requesterId).
+		SetUpdatedBy(requesterId).
 		Save(ctx)
 
 	if err != nil {

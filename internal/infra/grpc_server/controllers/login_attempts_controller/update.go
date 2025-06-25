@@ -3,6 +3,7 @@ package login_attempts_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *login_attempts_proto.UpdateRequest) (*login_attempts_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.LoginAttemptsNotFound(int(in.Id))
 	}
 
@@ -20,7 +21,10 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 		return nil, errs.StartTransactionError(err)
 	}
 
-	var login_attempts *ent.LoginAttempts
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
 
 	login_attemptsQ := tx.LoginAttempts.UpdateOneID(int(in.Id))
 
@@ -32,9 +36,9 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 		login_attemptsQ.SetSuccessful(bool(*in.Successful))
 	}
 
-	login_attemptsQ.SetUpdatedBy(int(in.RequesterId))
+	login_attemptsQ.SetUpdatedBy(requesterId)
 
-	login_attempts, err = login_attemptsQ.Save(ctx)
+	login_attempts, err := login_attemptsQ.Save(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, utils.Rollback(tx, errs.LoginAttemptsNotFound(int(in.Id)))
@@ -50,8 +54,8 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 	}
 
 	return &login_attempts_proto.UpdateResponse{
-		RequesterId: uint32(login_attempts.CreatedBy),
-		UserId:      uint32(login_attempts.UserID),
-		Successful:  bool(login_attempts.Successful),
+		RequesterUuid: in.RequesterUuid,
+		UserId:        uint32(login_attempts.UserID),
+		Successful:    bool(login_attempts.Successful),
 	}, nil
 }

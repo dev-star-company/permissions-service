@@ -3,6 +3,7 @@ package service_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/service_proto"
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest) (*service_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,7 +21,10 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 		return nil, errs.StartTransactionError(err)
 	}
 
-	var service *ent.Services
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
 
 	serviceQ := tx.Services.UpdateOneID(int(in.Id))
 
@@ -28,9 +32,9 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 		serviceQ.SetName(string(*in.Name))
 	}
 
-	serviceQ.SetUpdatedBy(int(in.RequesterId))
+	serviceQ.SetUpdatedBy(requesterId)
 
-	service, err = serviceQ.Save(ctx)
+	service, err := serviceQ.Save(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, utils.Rollback(tx, errs.ServiceNotFound(int(in.Id)))
@@ -46,7 +50,7 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 	}
 
 	return &service_proto.UpdateResponse{
-		RequesterId: uint32(service.CreatedBy),
-		Name:        string(service.Name),
+		RequesterUuid: in.RequesterUuid,
+		Name:          string(service.Name),
 	}, nil
 }

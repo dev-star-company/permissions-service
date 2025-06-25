@@ -2,6 +2,7 @@ package ban_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/ban_proto"
@@ -11,7 +12,7 @@ import (
 
 func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*ban_proto.CreateResponse, error) {
 
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,9 +21,16 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 		return nil, errs.StartTransactionError(err)
 	}
 
-	create, err := c.Db.Ban.Create().
-		SetCreatedBy(int(in.RequesterId)).
-		SetUpdatedBy(int(in.RequesterId)).
+	defer tx.Rollback()
+
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = c.Db.Ban.Create().
+		SetCreatedBy(requesterId).
+		SetUpdatedBy(requesterId).
 		Save(ctx)
 
 	if err != nil {
@@ -34,6 +42,6 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 	}
 
 	return &ban_proto.CreateResponse{
-		RequesterId: uint32(create.CreatedBy),
+		RequesterUuid: in.RequesterUuid,
 	}, nil
 }

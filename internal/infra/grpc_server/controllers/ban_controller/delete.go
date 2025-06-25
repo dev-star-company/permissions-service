@@ -2,6 +2,7 @@ package ban_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Delete(ctx context.Context, in *ban_proto.DeleteRequest) (*ban_proto.DeleteResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.BanNotFound(int(in.Id))
 	}
 
@@ -20,9 +21,14 @@ func (c *controller) Delete(ctx context.Context, in *ban_proto.DeleteRequest) (*
 		return nil, errs.StartTransactionError(err)
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	err = tx.Ban.UpdateOneID(int(in.Id)).
 		SetDeletedAt(time.Now()).
-		SetDeletedBy(int(in.RequesterId)).
+		SetDeletedBy(requesterId).
 		Exec(ctx)
 
 	if err != nil {

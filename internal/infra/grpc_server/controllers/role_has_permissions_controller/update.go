@@ -3,6 +3,7 @@ package role_has_permissions_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/role_has_permissions_proto"
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *role_has_permissions_proto.UpdateRequest) (*role_has_permissions_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RoleHasPermissionNotFound(int(in.Id))
 	}
 
@@ -20,13 +21,16 @@ func (c *controller) Update(ctx context.Context, in *role_has_permissions_proto.
 		return nil, errs.StartTransactionError(err)
 	}
 
-	var role_has_permissions *ent.RoleHasPermissions
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
 
 	role_has_permissionsQ := tx.RoleHasPermissions.UpdateOneID(int(in.Id))
 
-	role_has_permissionsQ.SetUpdatedBy(int(in.RequesterId))
+	role_has_permissionsQ.SetUpdatedBy(requesterId)
 
-	role_has_permissions, err = role_has_permissionsQ.Save(ctx)
+	_, err = role_has_permissionsQ.Save(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, utils.Rollback(tx, errs.RoleHasPermissionNotFound(int(in.Id)))
@@ -42,6 +46,6 @@ func (c *controller) Update(ctx context.Context, in *role_has_permissions_proto.
 	}
 
 	return &role_has_permissions_proto.UpdateResponse{
-		RequesterId: uint32(role_has_permissions.CreatedBy),
+		RequesterUuid: in.RequesterUuid,
 	}, nil
 }

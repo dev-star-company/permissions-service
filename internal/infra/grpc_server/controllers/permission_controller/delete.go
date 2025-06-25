@@ -2,6 +2,7 @@ package permission_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Delete(ctx context.Context, in *permission_proto.DeleteRequest) (*permission_proto.DeleteResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.PermissionNotFound(int(in.Id))
 	}
 
@@ -20,9 +21,14 @@ func (c *controller) Delete(ctx context.Context, in *permission_proto.DeleteRequ
 		return nil, errs.StartTransactionError(err)
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	err = tx.Permission.UpdateOneID(int(in.Id)).
 		SetDeletedAt(time.Now()).
-		SetDeletedBy(int(in.RequesterId)).
+		SetDeletedBy(requesterId).
 		Exec(ctx)
 
 	if err != nil {

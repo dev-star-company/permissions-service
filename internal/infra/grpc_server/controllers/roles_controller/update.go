@@ -3,6 +3,7 @@ package roles_controller
 import (
 	"context"
 	"permissions-service/internal/adapters/grpc_convertions"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) (*roles_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,9 +21,14 @@ func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) 
 		return nil, err
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	roleQ := tx.Role.
 		UpdateOneID(int(in.Id)).
-		SetUpdatedBy(int(in.RequesterId))
+		SetUpdatedBy(requesterId)
 
 	if in.Name != nil {
 		roleQ.SetName(*in.Name)

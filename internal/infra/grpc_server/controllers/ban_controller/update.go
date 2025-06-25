@@ -3,6 +3,7 @@ package ban_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/ban_proto"
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *ban_proto.UpdateRequest) (*ban_proto.UpdateResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.BanNotFound(int(in.Id))
 	}
 
@@ -19,14 +20,16 @@ func (c *controller) Update(ctx context.Context, in *ban_proto.UpdateRequest) (*
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
-
-	var ban *ent.Ban
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
 
 	banQ := tx.Ban.UpdateOneID(int(in.Id))
 
-	banQ.SetUpdatedBy(int(in.RequesterId))
+	banQ.SetUpdatedBy(requesterId)
 
-	ban, err = banQ.Save(ctx)
+	_, err = banQ.Save(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, utils.Rollback(tx, errs.BanNotFound(int(in.Id)))
@@ -42,6 +45,6 @@ func (c *controller) Update(ctx context.Context, in *ban_proto.UpdateRequest) (*
 	}
 
 	return &ban_proto.UpdateResponse{
-		RequesterId: uint32(ban.CreatedBy),
+		RequesterUuid: in.RequesterUuid,
 	}, nil
 }

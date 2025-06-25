@@ -2,6 +2,7 @@ package first_login_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func (c *controller) Delete(ctx context.Context, in *first_login_proto.DeleteRequest) (*first_login_proto.DeleteResponse, error) {
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.FirstLoginNotFound(int(in.Id))
 	}
 
@@ -20,9 +21,14 @@ func (c *controller) Delete(ctx context.Context, in *first_login_proto.DeleteReq
 		return nil, errs.StartTransactionError(err)
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	err = tx.FirstLogin.UpdateOneID(int(in.Id)).
 		SetDeletedAt(time.Now()).
-		SetDeletedBy(int(in.RequesterId)).
+		SetDeletedBy(requesterId).
 		Exec(ctx)
 
 	if err != nil {

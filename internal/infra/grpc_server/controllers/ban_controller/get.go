@@ -21,6 +21,6 @@ func (c *controller) Get(ctx context.Context, in *ban_proto.GetRequest) (*ban_pr
 	}
 
 	return &ban_proto.GetResponse{
-		RequesterId: uint32(ban.CreatedBy),
+		UserId: uint32(ban.UserID),
 	}, nil
 }

@@ -2,6 +2,7 @@ package first_login_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/first_login_proto"
@@ -11,7 +12,7 @@ import (
 
 func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateRequest) (*first_login_proto.CreateResponse, error) {
 
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,10 +21,15 @@ func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateReq
 		return nil, errs.StartTransactionError(err)
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	create, err := c.Db.FirstLogin.Create().
 		SetUserID(int(in.UserId)).
-		SetCreatedBy(int(in.RequesterId)).
-		SetUpdatedBy(int(in.RequesterId)).
+		SetCreatedBy(requesterId).
+		SetUpdatedBy(requesterId).
 		Save(ctx)
 
 	if err != nil {
@@ -35,7 +41,7 @@ func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateReq
 	}
 
 	return &first_login_proto.CreateResponse{
-		RequesterId: uint32(create.CreatedBy),
-		UserId:      uint32(*create.UserID),
+		RequesterUuid: in.RequesterUuid,
+		UserId:        uint32(*create.UserID),
 	}, nil
 }

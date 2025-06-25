@@ -2,6 +2,7 @@ package login_attempts_controller
 
 import (
 	"context"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
@@ -11,7 +12,7 @@ import (
 
 func (c *controller) Create(ctx context.Context, in *login_attempts_proto.CreateRequest) (*login_attempts_proto.CreateResponse, error) {
 
-	if in.RequesterId == 0 {
+	if in.RequesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}
 
@@ -20,11 +21,16 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 		return nil, errs.StartTransactionError(err)
 	}
 
+	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	create, err := c.Db.LoginAttempts.Create().
 		SetUserID(int(in.UserId)).
 		SetSuccessful(in.Successful).
-		SetCreatedBy(int(in.RequesterId)).
-		SetUpdatedBy(int(in.RequesterId)).
+		SetCreatedBy(requesterId).
+		SetUpdatedBy(requesterId).
 		Save(ctx)
 
 	if err != nil {
@@ -36,8 +42,8 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 	}
 
 	return &login_attempts_proto.CreateResponse{
-		RequesterId: uint32(create.CreatedBy),
-		UserId:      uint32(create.UserID),
-		Successful:  bool(create.Successful),
+		RequesterUuid: in.RequesterUuid,
+		UserId:        uint32(create.UserID),
+		Successful:    bool(create.Successful),
 	}, nil
 }

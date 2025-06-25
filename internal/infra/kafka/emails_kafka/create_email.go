@@ -26,7 +26,7 @@ func (c *emailsKafka) CreateEmail(u connection.SyncEmailStruct) error {
 		fmt.Println("Error checking if email exists:", err)
 	}
 
-	_, err = tx.User.Query().
+	us, err := tx.User.Query().
 		Where(
 			user.UUIDEQ(u.UserUuid),
 		).First(context.Background())
@@ -44,6 +44,9 @@ func (c *emailsKafka) CreateEmail(u connection.SyncEmailStruct) error {
 	} else {
 		_, err = tx.Email.Create().
 			SetUUID(u.Uuid).
+			SetEmail(*u.Email).
+			SetMain(*u.Main).
+			SetUserID(us.ID).
 			SetCreatedBy(int(*u.CreatedBy)).
 			SetCreatedAt(*u.CreatedAt).
 			SetUpdatedBy(int(*u.UpdatedBy)).

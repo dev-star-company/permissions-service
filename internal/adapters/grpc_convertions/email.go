@@ -13,6 +13,7 @@ func EmailToProto(email *ent.Email) *auth_users_proto.Email {
 
 	e := auth_users_proto.Email{
 		Id:        uint32(email.ID),
+		Uuid:      email.UUID.String(),
 		Email:     email.Email,
 		CreatedAt: email.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: email.UpdatedAt.Format("2006-01-02 15:04:05"),

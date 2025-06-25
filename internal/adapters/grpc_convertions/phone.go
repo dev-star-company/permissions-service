@@ -12,6 +12,7 @@ func PhoneToProto(phone *ent.Phone) *auth_users_proto.Phone {
 	}
 	p := auth_users_proto.Phone{
 		Id:        uint32(phone.ID),
+		Uuid:      phone.UUID.String(),
 		Phone:     phone.Phone,
 		CreatedBy: uint32(phone.CreatedBy),
 		UpdatedBy: uint32(phone.UpdatedBy),

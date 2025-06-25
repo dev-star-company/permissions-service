@@ -13,6 +13,7 @@ func UserToProto(user *ent.User) *auth_users_proto.User {
 
 	u := auth_users_proto.User{
 		Id:        uint32(user.ID),
+		Uuid:      user.UUID.String(),
 		Surname:   user.Surname,
 		Name:      user.Name,
 		CreatedBy: uint32(user.CreatedBy),

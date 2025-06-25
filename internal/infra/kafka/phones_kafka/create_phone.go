@@ -16,17 +16,7 @@ func (c *phonesKafka) CreatePhone(u connection.SyncPhoneStruct) error {
 	if err != nil {
 		return err
 	}
-
-	phoneExists, err := tx.Phone.Query().
-		Where(
-			phone.UUIDEQ(u.Uuid),
-		).First(context.Background())
-
-	if err != nil {
-		fmt.Println("Error checking if phone exists:", err)
-	}
-
-	_, err = tx.User.Query().
+	us, err := tx.User.Query().
 		Where(
 			user.UUIDEQ(u.UserUuid),
 		).First(context.Background())
@@ -35,15 +25,29 @@ func (c *phonesKafka) CreatePhone(u connection.SyncPhoneStruct) error {
 		fmt.Println("Error checking if user exists:", err)
 	}
 
+	phoneExists, err := tx.Phone.Query().
+		Where(
+			phone.UUIDEQ(u.Uuid),
+		).First(context.Background())
+
+	if err != nil || !ent.IsNotFound(err) {
+		fmt.Println("Error checking if phone exists:", err)
+	}
+
 	if phoneExists != nil {
 		_, err = tx.Phone.
 			UpdateOne(phoneExists).
+			SetUserID(us.ID).
+			SetPhone(*u.Phone).
 			SetUpdatedBy(int(*u.UpdatedBy)).
 			SetUpdatedAt(*u.UpdatedAt).
 			Save(context.Background())
 	} else {
 		_, err = tx.Phone.Create().
 			SetUUID(u.Uuid).
+			SetPhone(*u.Phone).
+			SetMain(*u.Main).
+			SetUserID(us.ID).
 			SetCreatedBy(int(*u.CreatedBy)).
 			SetCreatedAt(*u.CreatedAt).
 			SetUpdatedBy(int(*u.UpdatedBy)).

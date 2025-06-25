@@ -7,7 +7,7 @@ import (
 )
 
 func ToKafkaUser(user ent.User) connection.SyncUserStruct {
-	return connection.SyncUserStruct{
+	x := connection.SyncUserStruct{
 		Uuid:      user.UUID,
 		Name:      &user.Name,
 		Surname:   &user.Surname,
@@ -18,4 +18,20 @@ func ToKafkaUser(user ent.User) connection.SyncUserStruct {
 		UpdatedBy: &user.UpdatedBy,
 		DeletedBy: user.DeletedBy,
 	}
+
+	if user.Edges.Phones != nil {
+		x.Phones = make([]connection.SyncPhoneStruct, len(user.Edges.Phones))
+		for i, phone := range user.Edges.Phones {
+			x.Phones[i] = ToKafkaPhone(*phone, user)
+		}
+	}
+
+	if user.Edges.Emails != nil {
+		x.Emails = make([]connection.SyncEmailStruct, len(user.Edges.Emails))
+		for i, email := range user.Edges.Emails {
+			x.Emails[i] = ToKafkaEmail(*email, user)
+		}
+	}
+
+	return x
 }

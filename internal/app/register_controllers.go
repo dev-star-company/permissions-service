@@ -9,7 +9,6 @@ import (
 	"permissions-service/internal/infra/grpc_server/controllers/role_has_permissions_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/roles_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/service_controller"
-	"permissions-service/internal/infra/grpc_server/controllers/users_controller"
 
 	"github.com/dev-star-company/kafka-go/connection"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
@@ -32,5 +31,5 @@ func RegisterControllers(grpcServer *grpc.Server, client *ent.Client, k *connect
 	role_has_permissions_proto.RegisterRoleHasPermissionServiceServer(grpcServer, role_has_permissions_controller.New(client))
 	roles_proto.RegisterRoleServiceServer(grpcServer, roles_controller.New(client))
 	service_proto.RegisterServiceServiceServer(grpcServer, service_controller.New(client))
-	auth_users_proto.RegisterUsersServiceServer(grpcServer, users_controller.New(client, k))
+	auth_users_proto.RegisterAuthUsersServiceServer(grpcServer, users_controller.New(client, k))
 }

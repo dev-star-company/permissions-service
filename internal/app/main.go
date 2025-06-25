@@ -42,7 +42,7 @@ func New(port int) {
 	grpcServer := grpc.NewServer(opts...)
 
 	//Connect to topics that service use
-	conn := connection.New(env.KAFKA_CONSUMER_GROUP)
+	conn := connection.New(env.KAFKA_BROKER_URL, env.KAFKA_CONSUMER_GROUP)
 	k := kafka.New(client, conn)
 	go k.SyncUsers()
 

@@ -21,7 +21,7 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 		serviceQ.SetName(string(*in.Name))
 	}
 
-	serviceQ.SetUpdatedBy(requesterId)
+	serviceQ.SetUpdatedBy(requester.ID)
 
 	service, err := serviceQ.Save(ctx)
 	if err != nil {

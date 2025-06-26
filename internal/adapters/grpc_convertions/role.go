@@ -7,6 +7,10 @@ import (
 )
 
 func RoleToProto(role *ent.Role) *roles_proto.Role {
+	if role == nil {
+		return nil
+	}
+	
 	r := roles_proto.Role{
 		Id:          uint32(role.ID),
 		Name:        role.Name,

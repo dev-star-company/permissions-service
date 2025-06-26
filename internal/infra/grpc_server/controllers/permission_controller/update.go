@@ -21,7 +21,7 @@ func (c *controller) Update(ctx context.Context, in *permission_proto.UpdateRequ
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (c *controller) Update(ctx context.Context, in *permission_proto.UpdateRequ
 		permissionQ.SetName(string(*in.Name))
 	}
 
-	permissionQ.SetUpdatedBy(requesterId)
+	permissionQ.SetUpdatedBy(requester.ID)
 
 	permission, err := permissionQ.Save(ctx)
 	if err != nil {

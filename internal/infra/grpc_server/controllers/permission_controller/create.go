@@ -21,15 +21,15 @@ func (c *controller) Create(ctx context.Context, in *permission_proto.CreateRequ
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	create, err := c.Db.Permission.Create().
 		SetName(in.Name).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(requester.ID).
+		SetUpdatedBy(requester.ID).
 		Save(ctx)
 
 	if err != nil {

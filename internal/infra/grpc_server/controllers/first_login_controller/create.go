@@ -11,25 +11,27 @@ import (
 )
 
 func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateRequest) (*first_login_proto.CreateResponse, error) {
-
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	defer tx.Rollback()
+
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	create, err := c.Db.FirstLogin.Create().
-		SetUserID(int(in.UserId)).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+	user, err := controllers.GetUserIdFromUuid(tx, ctx, in.UserUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	create, err := tx.FirstLogin.Create().
+		SetUserID(user.ID).
+		SetCreatedBy(requester.ID).
+		SetUpdatedBy(requester.ID).
 		Save(ctx)
 
 	if err != nil {
@@ -42,6 +44,6 @@ func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateReq
 
 	return &first_login_proto.CreateResponse{
 		RequesterUuid: in.RequesterUuid,
-		UserId:        uint32(*create.UserID),
+		UserUuid:      create.Edges.User.UUID.String(),
 	}, nil
 }

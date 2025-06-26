@@ -13,7 +13,7 @@ func LoginAttemptsToProto(login_attempts *ent.LoginAttempts) *login_attempts_pro
 
 	e := login_attempts_proto.LoginAttempts{
 		Id:         uint32(login_attempts.ID),
-		UserId:     uint32(login_attempts.UserID),
+		UserUuid:   login_attempts.Edges.User.UUID.String(),
 		Successful: bool(login_attempts.Successful),
 		CreatedAt:  login_attempts.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:  login_attempts.UpdatedAt.Format("2006-01-02 15:04:05"),

@@ -25,7 +25,7 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 
 	defer tx.Rollback()
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +43,8 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
 		p, err := tx.Password.Create().
 			SetPassword(*in.Password).
-			SetCreatedBy(requesterId).
-			SetUpdatedBy(requesterId).
+			SetCreatedBy(requester.ID).
+			SetUpdatedBy(requester.ID).
 			Save(ctx)
 		if err != nil {
 			return nil, err

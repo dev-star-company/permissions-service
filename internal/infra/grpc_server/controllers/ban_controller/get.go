@@ -14,6 +14,7 @@ func (c *controller) Get(ctx context.Context, in *ban_proto.GetRequest) (*ban_pr
 	ban, err := c.Db.Ban.
 		Query().
 		Where(ban.ID(int(in.Id))).
+		WithUser().
 		Only(ctx)
 
 	if ent.IsNotFound(err) {
@@ -21,6 +22,7 @@ func (c *controller) Get(ctx context.Context, in *ban_proto.GetRequest) (*ban_pr
 	}
 
 	return &ban_proto.GetResponse{
-		UserId: uint32(ban.UserID),
+		ExpiresAt: ban.ExpiresAt.String(),
+		UserUuid:  ban.Edges.User.UUID.String(),
 	}, nil
 }

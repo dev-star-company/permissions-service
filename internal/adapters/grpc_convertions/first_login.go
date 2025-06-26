@@ -13,7 +13,7 @@ func FirstLoginToProto(first_login *ent.FirstLogin) *first_login_proto.FirstLogi
 
 	e := first_login_proto.FirstLogin{
 		Id:        uint32(first_login.ID),
-		UserId:    uint32(*first_login.UserID),
+		UserUuid:  first_login.Edges.User.UUID.String(),
 		CreatedAt: first_login.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: first_login.UpdatedAt.Format("2006-01-02 15:04:05"),
 		CreatedBy: uint32(first_login.CreatedBy),

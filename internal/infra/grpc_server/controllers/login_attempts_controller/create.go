@@ -11,26 +11,26 @@ import (
 )
 
 func (c *controller) Create(ctx context.Context, in *login_attempts_proto.CreateRequest) (*login_attempts_proto.CreateResponse, error) {
-
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := controllers.GetUserIdFromUuid(tx, ctx, in.UserUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	create, err := c.Db.LoginAttempts.Create().
-		SetUserID(int(in.UserId)).
+		SetUserID(user.ID).
 		SetSuccessful(in.Successful).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(requester.ID).
+		SetUpdatedBy(requester.ID).
 		Save(ctx)
 
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 
 	return &login_attempts_proto.CreateResponse{
 		RequesterUuid: in.RequesterUuid,
-		UserId:        uint32(create.UserID),
+		UserUuid:      user.UUID.String(),
 		Successful:    bool(create.Successful),
 	}, nil
 }

@@ -21,14 +21,14 @@ func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) 
 		return nil, err
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	roleQ := tx.Role.
 		UpdateOneID(int(in.Id)).
-		SetUpdatedBy(requesterId)
+		SetUpdatedBy(requester.ID)
 
 	if in.Name != nil {
 		roleQ.SetName(*in.Name)

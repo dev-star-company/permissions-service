@@ -7,6 +7,10 @@ import (
 )
 
 func PermissionToProto(permission *ent.Permission) *permission_proto.Permission {
+	if permission == nil {
+		return nil
+	}
+
 	p := permission_proto.Permission{
 		Id:          uint32(permission.ID),
 		Name:        permission.Name,

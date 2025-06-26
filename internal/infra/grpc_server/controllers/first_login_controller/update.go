@@ -12,27 +12,27 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateRequest) (*first_login_proto.UpdateResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.FirstLoginNotFound(int(in.Id))
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	first_loginQ := tx.FirstLogin.UpdateOneID(int(in.Id))
 
-	if in.UserId != nil && *in.UserId != 0 {
-		first_loginQ.SetUserID(int(*in.UserId))
+	if in.UserUuid != nil && *in.UserUuid != "" {
+		user, err := controllers.GetUserIdFromUuid(tx, ctx, *in.UserUuid)
+		if err != nil {
+			return nil, utils.Rollback(tx, err)
+		}
+		first_loginQ.SetUserID(user.ID)
 	}
 
-	first_loginQ.SetUpdatedBy(requesterId)
+	first_loginQ.SetUpdatedBy(requester.ID)
 
 	first_login, err := first_loginQ.Save(ctx)
 	if err != nil {
@@ -51,6 +51,6 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 
 	return &first_login_proto.UpdateResponse{
 		RequesterUuid: in.RequesterUuid,
-		UserId:        uint32(*first_login.UserID),
+		UserUuid:      first_login.Edges.User.UUID.String(),
 	}, nil
 }

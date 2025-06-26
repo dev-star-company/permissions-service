@@ -21,7 +21,7 @@ func (c *controller) Create(ctx context.Context, in *roles_proto.CreateRequest) 
 		return nil, fmt.Errorf("starting a transaction: %w", err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +30,8 @@ func (c *controller) Create(ctx context.Context, in *roles_proto.CreateRequest) 
 	role, err := tx.Role.Create().
 		SetName(in.Name).
 		SetDescription(in.Description).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(requester.ID).
+		SetUpdatedBy(requester.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err

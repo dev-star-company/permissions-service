@@ -21,14 +21,14 @@ func (c *controller) Update(ctx context.Context, in *role_has_permissions_proto.
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	role_has_permissionsQ := tx.RoleHasPermissions.UpdateOneID(int(in.Id))
 
-	role_has_permissionsQ.SetUpdatedBy(requesterId)
+	role_has_permissionsQ.SetUpdatedBy(requester.ID)
 
 	_, err = role_has_permissionsQ.Save(ctx)
 	if err != nil {

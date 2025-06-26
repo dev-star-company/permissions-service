@@ -12,23 +12,19 @@ import (
 )
 
 func (c *controller) Delete(ctx context.Context, in *role_has_permissions_proto.DeleteRequest) (*role_has_permissions_proto.DeleteResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.RoleHasPermissionNotFound(int(in.Id))
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	err = tx.RoleHasPermissions.UpdateOneID(int(in.Id)).
 		SetDeletedAt(time.Now()).
-		SetDeletedBy(requesterId).
+		SetDeletedBy(requester.ID).
 		Exec(ctx)
 
 	if err != nil {

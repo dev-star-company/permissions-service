@@ -7,6 +7,7 @@ import (
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/loginattempts"
 	"permissions-service/internal/app/ent/schema"
+	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
@@ -26,8 +27,12 @@ func (c *controller) List(ctx context.Context, in *login_attempts_proto.ListRequ
 
 	query := tx.LoginAttempts.Query()
 
-	if in.UserId != nil {
-		query = query.Where(loginattempts.UserID(int(*in.UserId)))
+	if in.UserUuid != nil && *in.UserUuid != "" {
+		uuidUser, err := controllers.GetUserIdFromUuid(tx, ctx, *in.UserUuid)
+		if err != nil {
+			return nil, err
+		}
+		query = query.Where(loginattempts.UserID(int(uuidUser.ID)))
 	}
 
 	if in.Successful != nil {

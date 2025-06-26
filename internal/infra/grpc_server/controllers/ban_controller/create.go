@@ -23,14 +23,14 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 
 	defer tx.Rollback()
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	_, err = c.Db.Ban.Create().
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(requester.ID).
+		SetUpdatedBy(requester.ID).
 		Save(ctx)
 
 	if err != nil {

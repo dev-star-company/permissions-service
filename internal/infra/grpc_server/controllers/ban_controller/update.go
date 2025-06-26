@@ -20,14 +20,14 @@ func (c *controller) Update(ctx context.Context, in *ban_proto.UpdateRequest) (*
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	banQ := tx.Ban.UpdateOneID(int(in.Id))
 
-	banQ.SetUpdatedBy(requesterId)
+	banQ.SetUpdatedBy(requester.ID)
 
 	_, err = banQ.Save(ctx)
 	if err != nil {

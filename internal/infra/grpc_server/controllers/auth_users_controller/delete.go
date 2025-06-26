@@ -23,7 +23,7 @@ func (c *controller) Delete(ctx context.Context, in *auth_users_proto.DeleteRequ
 
 	defer tx.Rollback()
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (c *controller) Delete(ctx context.Context, in *auth_users_proto.DeleteRequ
 		return nil, utils.Rollback(tx, fmt.Errorf("deleting user: %w", err))
 	}
 
-	err = tx.User.UpdateOneID(int(in.Id)).SetDeletedBy(requesterId).Exec(ctx)
+	err = tx.User.UpdateOneID(int(in.Id)).SetDeletedBy(requester.ID).Exec(ctx)
 	if err != nil {
 		return nil, utils.Rollback(tx, fmt.Errorf("deleting user: %w", err))
 	}

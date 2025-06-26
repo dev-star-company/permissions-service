@@ -12,31 +12,31 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *login_attempts_proto.UpdateRequest) (*login_attempts_proto.UpdateResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.LoginAttemptsNotFound(int(in.Id))
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	login_attemptsQ := tx.LoginAttempts.UpdateOneID(int(in.Id))
 
-	if in.UserId != nil && *in.UserId != 0 {
-		login_attemptsQ.SetUserID(int(*in.UserId))
+	if in.UserUuid != nil && *in.UserUuid != "" {
+		user, err := controllers.GetUserIdFromUuid(tx, ctx, *in.UserUuid)
+		if err != nil {
+			return nil, utils.Rollback(tx, err)
+		}
+		login_attemptsQ.SetUserID(user.ID)
 	}
 
 	if in.Successful != nil {
 		login_attemptsQ.SetSuccessful(bool(*in.Successful))
 	}
 
-	login_attemptsQ.SetUpdatedBy(requesterId)
+	login_attemptsQ.SetUpdatedBy(requester.ID)
 
 	login_attempts, err := login_attemptsQ.Save(ctx)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *controller) Update(ctx context.Context, in *login_attempts_proto.Update
 
 	return &login_attempts_proto.UpdateResponse{
 		RequesterUuid: in.RequesterUuid,
-		UserId:        uint32(login_attempts.UserID),
+		UserUuid:      login_attempts.Edges.User.UUID.String(),
 		Successful:    bool(login_attempts.Successful),
 	}, nil
 }

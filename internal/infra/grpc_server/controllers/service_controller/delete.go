@@ -21,14 +21,14 @@ func (c *controller) Delete(ctx context.Context, in *service_proto.DeleteRequest
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
 	err = tx.Services.UpdateOneID(int(in.Id)).
 		SetDeletedAt(time.Now()).
-		SetDeletedBy(requesterId).
+		SetDeletedBy(requester.ID).
 		Exec(ctx)
 
 	if err != nil {

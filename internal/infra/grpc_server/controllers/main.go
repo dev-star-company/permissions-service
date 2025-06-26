@@ -5,28 +5,29 @@ import (
 	"fmt"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/user"
+	"permissions-service/internal/pkg/utils/parser"
 
 	"github.com/dev-star-company/service-errors/errs"
-	"github.com/google/uuid"
 )
 
-func GetRequesterId(tx *ent.Tx, ctx context.Context, requesterUuid string) (int, error) {
+func GetUserIdFromUuid(tx *ent.Tx, ctx context.Context, requesterUuid string) (*ent.User, error) {
 	if requesterUuid == "" {
-		return 0, errs.RequesterIDRequired()
+		return nil, errs.RequesterIDRequired()
 	}
 
-	uuidRequester, err := uuid.Parse(requesterUuid)
+	uuidRequester, err := parser.Uuid(requesterUuid)
 	if err != nil {
-		return 0, fmt.Errorf("invalid requester UUID: %w", err)
+		return nil, fmt.Errorf("invalid requester UUID: %w", err)
 	}
+
 	requesterUser, err := tx.User.Query().
 		Where(user.UUIDEQ(uuidRequester)).
 		Only(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("fetching requester user: %w", err)
+		return nil, fmt.Errorf("fetching requester user: %w", err)
 	}
 	if requesterUser == nil {
-		return 0, fmt.Errorf("usuário solicitante não encontrado")
+		return nil, errs.UserNotFound(0)
 	}
-	return requesterUser.ID, nil
+	return requesterUser, nil
 }

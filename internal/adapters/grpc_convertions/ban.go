@@ -13,7 +13,7 @@ func BanToProto(ban *ent.Ban) *ban_proto.Ban {
 
 	e := ban_proto.Ban{
 		Id:        uint32(ban.ID),
-		UserId:    uint32(ban.UserID),
+		UserUuid:  ban.Edges.User.UUID.String(),
 		ExpiresAt: ban.ExpiresAt.Format("2006-01-02 15:04:05"),
 		CreatedAt: ban.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: ban.UpdatedAt.Format("2006-01-02 15:04:05"),

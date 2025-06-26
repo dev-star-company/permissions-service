@@ -1,9 +1,15 @@
 package schema
 
 import (
+	"context"
+	"permissions-service/internal/app/ent/hook"
+	"permissions-service/internal/pkg/utils/hash_password"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	gen "permissions-service/internal/app/ent"
 )
 
 // Password holds the schema definition for the Password entity.
@@ -32,25 +38,25 @@ func (Password) Edges() []ent.Edge {
 	}
 }
 
-// func (Password) Hooks() []ent.Hook {
-// 	return []ent.Hook{
-// 		// First hook.
-// 		hook.On(
-// 			func(next ent.Mutator) ent.Mutator {
-// 				return hook.PasswordFunc(func(ctx context.Context, m *gen.PasswordMutation) (ent.Value, error) {
-// 					if password, exists := m.Password(); exists {
-// 						hashed_pw, err := hash_password.Hash(password)
-// 						if err != nil {
-// 							return nil, err
-// 						}
-// 						m.SetPassword(hashed_pw)
-// 					}
+func (Password) Hooks() []ent.Hook {
+	return []ent.Hook{
+		// First hook.
+		hook.On(
+			func(next ent.Mutator) ent.Mutator {
+				return hook.PasswordFunc(func(ctx context.Context, m *gen.PasswordMutation) (ent.Value, error) {
+					if password, exists := m.Password(); exists {
+						hashed_pw, err := hash_password.Hash(password)
+						if err != nil {
+							return nil, err
+						}
+						m.SetPassword(hashed_pw)
+					}
 
-// 					return next.Mutate(ctx, m)
-// 				})
-// 			},
-// 			// Limit the hook only for these operations.
-// 			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
-// 		),
-// 	}
-// }
+					return next.Mutate(ctx, m)
+				})
+			},
+			// Limit the hook only for these operations.
+			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
+		),
+	}
+}

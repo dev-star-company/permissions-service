@@ -8,7 +8,6 @@ import (
 	"permissions-service/internal/app/ent/email"
 	"permissions-service/internal/app/ent/phone"
 	"permissions-service/internal/config/env"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/kafka-go/actions"
@@ -18,10 +17,6 @@ import (
 )
 
 func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequest) (*auth_users_proto.CreateResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
@@ -29,17 +24,17 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 
 	defer tx.Rollback()
 
-	requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
-	}
+	// requesterId, err := controllers.GetRequesterId(tx, ctx, in.RequesterUuid)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Create a new user in the database
 	user, err := tx.User.Create().
 		SetName(in.Name).
 		SetSurname(in.Surname).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(1).
+		SetUpdatedBy(1).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -56,8 +51,8 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	email, err := tx.Email.Create().
 		SetEmail(in.Email).
 		SetUserID(user.ID).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(user.ID).
+		SetUpdatedBy(user.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -66,8 +61,8 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	password, err := tx.Password.Create().
 		SetPassword(in.Password).
 		SetUserID(user.ID).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(user.ID).
+		SetUpdatedBy(user.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -84,8 +79,8 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	phone, err := tx.Phone.Create().
 		SetPhone(in.Phone).
 		SetUserID(user.ID).
-		SetCreatedBy(requesterId).
-		SetUpdatedBy(requesterId).
+		SetCreatedBy(user.ID).
+		SetUpdatedBy(user.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err

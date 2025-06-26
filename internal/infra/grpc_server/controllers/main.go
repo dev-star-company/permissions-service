@@ -6,10 +6,15 @@ import (
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/user"
 
+	"github.com/dev-star-company/service-errors/errs"
 	"github.com/google/uuid"
 )
 
 func GetRequesterId(tx *ent.Tx, ctx context.Context, requesterUuid string) (int, error) {
+	if requesterUuid == "" {
+		return 0, errs.RequesterIDRequired()
+	}
+
 	uuidRequester, err := uuid.Parse(requesterUuid)
 	if err != nil {
 		return 0, fmt.Errorf("invalid requester UUID: %w", err)

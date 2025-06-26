@@ -17,8 +17,16 @@ github.com/dev-star-company/custom-validate v0.0.0-20250610193354-9fdb77405da0 h
 github.com/dev-star-company/custom-validate v0.0.0-20250610193354-9fdb77405da0/go.mod h1:71KLWEeZrjuq7kc4WWjBSHlZKUfUprzTTIp4VTdH5kU=
 github.com/dev-star-company/kafka-go v0.0.0-20250625153852-3de6b4fa58aa h1:c3QeVTWSNWgN2eFuyUYrPvN7Ngwuuvql4E9x3O1UtJ0=
 github.com/dev-star-company/kafka-go v0.0.0-20250625153852-3de6b4fa58aa/go.mod h1:G18pJcMn/fnue+GG2gsA2VT9TsNDqs2cg5xaKidQYs4=
+github.com/dev-star-company/kafka-go v0.0.0-20250626144000-60b3e0a820fa h1:/he78MBJGl051tMp89sLGQskb8BT1yzO9oM+fL6z7LQ=
+github.com/dev-star-company/kafka-go v0.0.0-20250626144000-60b3e0a820fa/go.mod h1:G18pJcMn/fnue+GG2gsA2VT9TsNDqs2cg5xaKidQYs4=
 github.com/dev-star-company/protos-go v0.0.0-20250625183324-babd3273e5ae h1:mL6jqw6ApWfE7/JwGM7wkNO+yGZdTpMgbf+hLpYx2iY=
 github.com/dev-star-company/protos-go v0.0.0-20250625183324-babd3273e5ae/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
+github.com/dev-star-company/protos-go v0.0.0-20250625191315-764a60f946d1 h1:dNf4idijLYFb2z/alryN4XUjNRSVI33TlkgDm6ZP6Mk=
+github.com/dev-star-company/protos-go v0.0.0-20250625191315-764a60f946d1/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
+github.com/dev-star-company/protos-go v0.0.0-20250626113912-409cfe89cf38 h1:TB3DzPIdOltztZAwkeF4ycl5bWLs1K7k4tu2RgA0I2U=
+github.com/dev-star-company/protos-go v0.0.0-20250626113912-409cfe89cf38/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
+github.com/dev-star-company/protos-go v0.0.0-20250626123319-dfebb79acba5 h1:sinZLrptX401x7gfT+Ji5/h3Mj4nZJzoHSMBoykwBNc=
+github.com/dev-star-company/protos-go v0.0.0-20250626123319-dfebb79acba5/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
 github.com/dev-star-company/service-errors v0.0.0-20250614153158-1e7d0fcbea66 h1:eI/2l8EO/ZERr8iqqt60m7pKlZfRsBgntgjcoDTlkKM=
 github.com/dev-star-company/service-errors v0.0.0-20250614153158-1e7d0fcbea66/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
 github.com/dev-star-company/service-errors v0.0.0-20250623164759-b94c409aedcf h1:Ajj/P0QmAUyE/mUFYCPDD3kKBIhSJmPA8a0lOEmlvHc=

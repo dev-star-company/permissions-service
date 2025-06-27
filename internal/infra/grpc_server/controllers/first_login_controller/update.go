@@ -17,7 +17,7 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 	first_loginQ := tx.FirstLogin.UpdateOneID(int(in.Id))
 
 	if in.UserUuid != nil && *in.UserUuid != "" {
-		user, err := controllers.GetUserIdFromUuid(tx, ctx, *in.UserUuid)
+		user, err := controllers.GetUserFromUuid(tx, ctx, *in.UserUuid)
 		if err != nil {
 			return nil, utils.Rollback(tx, err)
 		}

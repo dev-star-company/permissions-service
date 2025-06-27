@@ -28,7 +28,7 @@ func (c *controller) List(ctx context.Context, in *login_attempts_proto.ListRequ
 	query := tx.LoginAttempts.Query()
 
 	if in.UserUuid != nil && *in.UserUuid != "" {
-		uuidUser, err := controllers.GetUserIdFromUuid(tx, ctx, *in.UserUuid)
+		uuidUser, err := controllers.GetUserFromUuid(tx, ctx, *in.UserUuid)
 		if err != nil {
 			return nil, err
 		}

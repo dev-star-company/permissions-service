@@ -21,7 +21,7 @@ func (c *controller) Update(ctx context.Context, in *role_has_permissions_proto.
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}

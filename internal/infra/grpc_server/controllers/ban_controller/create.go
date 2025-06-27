@@ -23,7 +23,7 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 
 	defer tx.Rollback()
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}

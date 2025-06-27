@@ -16,12 +16,12 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := controllers.GetUserIdFromUuid(tx, ctx, in.UserUuid)
+	user, err := controllers.GetUserFromUuid(tx, ctx, in.UserUuid)
 	if err != nil {
 		return nil, err
 	}

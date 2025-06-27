@@ -25,12 +25,23 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 
 	defer tx.Rollback()
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
-	// Update the user in the database
-	userQ := tx.User.UpdateOneID(int(in.Id))
+
+	var userQ *ent.UserUpdateOne
+	if in.Id != nil {
+		userQ = tx.User.UpdateOneID(int(*in.Id))
+	} else if in.Uuid != nil {
+		u, err := controllers.GetUserFromUuid(tx, ctx, *in.Uuid)
+		if err != nil {
+			return nil, err
+		}
+		userQ = tx.User.UpdateOneID(u.ID)
+	} else {
+		return nil, errs.UserNotFound(0)
+	}
 
 	if in.Name != nil {
 		userQ.SetName(*in.Name)
@@ -57,7 +68,7 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 		}
 	}
 
-	user, err := userQ.Save(ctx)
+	user, err := userQ.SetUpdatedBy(requester.ID).Save(ctx)
 	if err != nil {
 		return nil, err
 	}

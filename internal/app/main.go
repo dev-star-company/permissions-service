@@ -45,6 +45,8 @@ func New(port int) {
 	conn := connection.New(env.KAFKA_BROKER_URL, env.KAFKA_CONSUMER_GROUP)
 	k := kafka.New(client, conn)
 	go k.SyncUsers()
+	go k.SyncEmails()
+	go k.SyncPhones()
 
 	RegisterControllers(grpcServer, client, conn)
 	reflection.Register(grpcServer)

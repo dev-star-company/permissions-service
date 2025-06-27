@@ -21,7 +21,7 @@ func (c *controller) Create(ctx context.Context, in *roles_proto.CreateRequest) 
 		return nil, fmt.Errorf("starting a transaction: %w", err)
 	}
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ func (c *controller) Delete(ctx context.Context, in *first_login_proto.DeleteReq
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}

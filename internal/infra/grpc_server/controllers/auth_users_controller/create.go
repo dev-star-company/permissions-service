@@ -25,7 +25,7 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 
 	defer tx.Rollback()
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}

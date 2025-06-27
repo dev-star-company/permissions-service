@@ -21,7 +21,7 @@ func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) 
 		return nil, err
 	}
 
-	requester, err := controllers.GetUserIdFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}

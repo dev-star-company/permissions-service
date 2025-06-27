@@ -28,7 +28,7 @@ func (c *controller) List(ctx context.Context, in *first_login_proto.ListRequest
 	query := tx.FirstLogin.Query()
 
 	if in.UserUuid != nil && *in.UserUuid != "" {
-		uuidUser, err := controllers.GetUserIdFromUuid(tx, ctx, *in.UserUuid)
+		uuidUser, err := controllers.GetUserFromUuid(tx, ctx, *in.UserUuid)
 		if err != nil {
 			return nil, err
 		}

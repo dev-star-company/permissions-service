@@ -10,7 +10,7 @@ import (
 	"github.com/dev-star-company/service-errors/errs"
 )
 
-func GetUserIdFromUuid(tx *ent.Tx, ctx context.Context, requesterUuid string) (*ent.User, error) {
+func GetUserFromUuid(tx *ent.Tx, ctx context.Context, requesterUuid string) (*ent.User, error) {
 	if requesterUuid == "" {
 		return nil, errs.RequesterIDRequired()
 	}

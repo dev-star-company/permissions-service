@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"permissions-service/internal/app/ent"
+	_ "permissions-service/internal/app/ent/runtime"
 	"permissions-service/internal/config/env"
 	"permissions-service/internal/infra/kafka"
 

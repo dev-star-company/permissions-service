@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	entgo.io/ent v0.14.4
 	github.com/dev-star-company/kafka-go v0.0.0-20250626144000-60b3e0a820fa
-	github.com/dev-star-company/protos-go v0.0.0-20250709183533-4c26ecbe45fe
+	github.com/dev-star-company/protos-go v0.0.0-20250710172435-32090cf5367c
 	github.com/dev-star-company/service-errors v0.0.0-20250623164759-b94c409aedcf
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/grpc v1.73.0

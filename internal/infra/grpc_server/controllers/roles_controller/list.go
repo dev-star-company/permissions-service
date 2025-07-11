@@ -3,6 +3,7 @@ package roles_controller
 import (
 	"context"
 	"permissions-service/internal/adapters/grpc_convertions"
+	"permissions-service/internal/app/ent/role"
 	"permissions-service/internal/app/ent/schema"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
@@ -11,11 +12,30 @@ import (
 func (c *controller) List(ct context.Context, in *roles_proto.ListRequest) (*roles_proto.ListResponse, error) {
 	ctx := ct
 
-	// Create a new role in the database
 	rolesQ := c.Db.Role.Query()
 
 	if in.IncludeDeleted != nil && *in.IncludeDeleted {
 		ctx = schema.SkipSoftDelete(ctx)
+	}
+
+	if in.Name != nil {
+		rolesQ = rolesQ.Where(role.NameContainsFold(*in.Name))
+	}
+
+	if in.Description != nil {
+		rolesQ = rolesQ.Where(role.DescriptionContainsFold(*in.Description))
+	}
+
+	if in.IsActive != nil {
+		rolesQ = rolesQ.Where(role.IsActiveEQ(*in.IsActive))
+	}
+
+	if in.Limit != nil && *in.Limit > 0 {
+		rolesQ = rolesQ.Limit(int(*in.Limit))
+	}
+
+	if in.Offset != nil && *in.Offset > 0 {
+		rolesQ = rolesQ.Offset(int(*in.Offset))
 	}
 
 	roles, err := rolesQ.All(ctx)
@@ -23,7 +43,7 @@ func (c *controller) List(ct context.Context, in *roles_proto.ListRequest) (*rol
 		return nil, err
 	}
 
-	count, err := rolesQ.Count(ctx)
+	count, err := rolesQ.Clone().Count(ctx)
 	if err != nil {
 		return nil, err
 	}

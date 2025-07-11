@@ -29,6 +29,7 @@ func (c *controller) Create(ctx context.Context, in *roles_proto.CreateRequest) 
 	// Create a new role in the database
 	role, err := tx.Role.Create().
 		SetName(in.Name).
+		SetIsActive(*in.IsActive).
 		SetDescription(in.Description).
 		SetCreatedBy(requester.ID).
 		SetUpdatedBy(requester.ID).

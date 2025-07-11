@@ -10,16 +10,20 @@ func RoleToProto(role *ent.Role) *roles_proto.Role {
 	if role == nil {
 		return nil
 	}
-	
+
 	r := roles_proto.Role{
 		Id:          uint32(role.ID),
 		Name:        role.Name,
 		Description: role.Description,
-		IsActive:    role.IsActive,
 		CreatedAt:   role.CreatedAt.String(),
 		UpdatedAt:   role.UpdatedAt.String(),
 		CreatedBy:   uint32(role.CreatedBy),
 		UpdatedBy:   uint32(role.UpdatedBy),
+	}
+
+	if role.IsActive != nil {
+		x := bool(*role.IsActive)
+		r.IsActive = &x
 	}
 
 	if role.DeletedAt != nil {

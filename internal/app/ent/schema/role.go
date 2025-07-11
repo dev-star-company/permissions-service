@@ -22,7 +22,7 @@ func (Role) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty(),
 		field.String("description").Optional(),
-		field.Bool("is_active").Default(true),
+		field.Bool("is_active").Nillable().Optional().Default(true),
 	}
 }
 

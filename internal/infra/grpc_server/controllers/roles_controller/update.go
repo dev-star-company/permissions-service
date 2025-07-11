@@ -34,6 +34,10 @@ func (c *controller) Update(ctx context.Context, in *roles_proto.UpdateRequest) 
 		roleQ.SetName(*in.Name)
 	}
 
+	if in.IsActive != nil {
+		roleQ.SetIsActive(*in.IsActive)
+	}
+
 	if in.Description != nil {
 		roleQ.SetDescription(*in.Description)
 	}

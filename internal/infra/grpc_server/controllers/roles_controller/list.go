@@ -38,6 +38,30 @@ func (c *controller) List(ct context.Context, in *roles_proto.ListRequest) (*rol
 		rolesQ = rolesQ.Offset(int(*in.Offset))
 	}
 
+	if in.OrderBy != nil {
+		if val := in.OrderBy.Id; val != nil {
+			if *val == "asc" {
+				rolesQ = rolesQ.Order(role.ByID())
+			} else if *val == "desc" {
+				rolesQ = rolesQ.Order(role.ByID().Desc())
+			}
+		}
+		if val := in.OrderBy.Name; val != nil {
+			if *val == "asc" {
+				rolesQ = rolesQ.Order(role.ByName())
+			} else if *val == "desc" {
+				rolesQ = rolesQ.Order(role.ByName().Desc())
+			}
+		}
+		if val := in.OrderBy.CreatedAt; val != nil {
+			if *val == "asc" {
+				rolesQ = rolesQ.Order(role.ByCreatedAt())
+			} else if *val == "desc" {
+				rolesQ = rolesQ.Order(role.ByCreatedAt().Desc())
+			}
+		}
+	}
+
 	roles, err := rolesQ.All(ctx)
 	if err != nil {
 		return nil, err

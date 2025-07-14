@@ -7,8 +7,6 @@ import (
 
 	gen "permissions-service/internal/app/ent"
 
-	"entgo.io/contrib/entgql"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -22,7 +20,7 @@ type Role struct {
 // Fields of the Role.
 func (Role) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
+		field.String("name").NotEmpty(),
 		field.String("description").Optional(),
 		field.Bool("is_active").Nillable().Optional().Default(true),
 	}

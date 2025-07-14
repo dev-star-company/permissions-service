@@ -37,7 +37,7 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 		rolesQ = rolesQ.Limit(int(*in.Limit))
 	}
 
-	if in.Offset != nil && *in.Offset > 0 {
+	if in.Offset != nil {
 		rolesQ = rolesQ.Offset(int(*in.Offset))
 	}
 

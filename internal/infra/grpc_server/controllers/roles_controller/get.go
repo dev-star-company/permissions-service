@@ -7,7 +7,6 @@ import (
 	"permissions-service/internal/app/ent/role"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
-	"github.com/google/uuid"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,10 +16,6 @@ func (c *controller) Get(ctx context.Context, in *roles_proto.GetRequest) (*role
 
 	if in.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "role ID is required")
-	}
-
-	if _, err := uuid.Parse(in.RequesterUuid); err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid requester UUID")
 	}
 
 	roleEntity, err := c.Db.Role.

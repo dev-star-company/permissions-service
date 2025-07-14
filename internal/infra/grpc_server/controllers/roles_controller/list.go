@@ -3,6 +3,7 @@ package roles_controller
 import (
 	"context"
 	"errors"
+	"fmt"
 	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/role"
@@ -53,9 +54,10 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 			if !validSorts[sort] {
 				return nil, errs.InvalidArgument(errors.New("invalid sort for id"))
 			}
-			if sort == "asc" {
+			switch sort {
+			case "asc":
 				rolesQ = rolesQ.Order(ent.Asc("id"))
-			} else if sort == "desc" {
+			case "desc":
 				rolesQ = rolesQ.Order(ent.Desc("id"))
 			}
 		}
@@ -65,9 +67,10 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 			if !validSorts[sort] {
 				return nil, errs.InvalidArgument(errors.New("invalid sort for name"))
 			}
-			if sort == "asc" {
+			switch sort {
+			case "asc":
 				rolesQ = rolesQ.Order(ent.Asc("name"))
-			} else if sort == "desc" {
+			case "desc":
 				rolesQ = rolesQ.Order(ent.Desc("name"))
 			}
 		}
@@ -77,22 +80,23 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 			if !validSorts[sort] {
 				return nil, errs.InvalidArgument(errors.New("invalid sort for created_at"))
 			}
-			if sort == "asc" {
+			switch sort {
+			case "asc":
 				rolesQ = rolesQ.Order(ent.Asc("created_at"))
-			} else if sort == "desc" {
+			case "desc":
 				rolesQ = rolesQ.Order(ent.Desc("created_at"))
 			}
 		}
 	}
 
-	count, err := rolesQ.Clone().Count(ctx)
+	count, err := rolesQ.Count(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("querying users: %w", err)
 	}
 
 	roles, err := rolesQ.All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("querying users: %w", err)
 	}
 
 	response := &roles_proto.ListResponse{

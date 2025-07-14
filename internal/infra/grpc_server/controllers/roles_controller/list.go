@@ -35,14 +35,6 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 		rolesQ = rolesQ.Where(role.IsActiveEQ(*in.IsActive))
 	}
 
-	if in.Limit != nil && *in.Limit > 0 {
-		rolesQ = rolesQ.Limit(int(*in.Limit))
-	}
-
-	if in.Offset != nil && *in.Offset > 0 {
-		rolesQ = rolesQ.Offset(int(*in.Offset))
-	}
-
 	validSorts := map[string]bool{
 		"":     true,
 		"asc":  true,
@@ -95,9 +87,13 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 		return nil, fmt.Errorf("querying roles: %w", err)
 	}
 
-	rolesQ = rolesQ.
-		Limit(int(*in.Limit)).
-		Offset(int(*in.Offset))
+	if in.Limit != nil && *in.Limit > 0 {
+		rolesQ = rolesQ.Limit(int(*in.Limit))
+	}
+
+	if in.Offset != nil && *in.Offset > 0 {
+		rolesQ = rolesQ.Offset(int(*in.Offset))
+	}
 
 	roles, err := rolesQ.All(ctx)
 	if err != nil {

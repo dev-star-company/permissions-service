@@ -37,7 +37,7 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 		rolesQ = rolesQ.Limit(int(*in.Limit))
 	}
 
-	if in.Offset != nil {
+	if in.Offset != nil && *in.Offset > 0 {
 		rolesQ = rolesQ.Offset(int(*in.Offset))
 	}
 
@@ -85,12 +85,12 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 		}
 	}
 
-	roles, err := rolesQ.All(ctx)
+	count, err := rolesQ.Clone().Count(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	count, err := rolesQ.Clone().Count(ctx)
+	roles, err := rolesQ.All(ctx)
 	if err != nil {
 		return nil, err
 	}

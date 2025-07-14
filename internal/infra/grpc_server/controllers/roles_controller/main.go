@@ -18,7 +18,7 @@ type Controller interface {
 }
 
 type controller struct {
-	roles_proto.RoleServiceServer
+	roles_proto.UnimplementedRoleServiceServer
 
 	Db *ent.Client
 }

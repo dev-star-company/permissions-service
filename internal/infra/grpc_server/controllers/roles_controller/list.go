@@ -9,8 +9,7 @@ import (
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
 )
 
-func (c *controller) List(ct context.Context, in *roles_proto.ListRequest) (*roles_proto.ListResponse, error) {
-	ctx := ct
+func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*roles_proto.ListResponse, error) {
 
 	rolesQ := c.Db.Role.Query()
 

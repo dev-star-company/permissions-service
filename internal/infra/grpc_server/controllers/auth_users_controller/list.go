@@ -12,8 +12,7 @@ import (
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
 )
 
-func (c *controller) List(ct context.Context, in *auth_users_proto.ListRequest) (*auth_users_proto.ListResponse, error) {
-	ctx := ct
+func (c *controller) List(ctx context.Context, in *auth_users_proto.ListRequest) (*auth_users_proto.ListResponse, error) {
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("starting a transaction: %w", err)

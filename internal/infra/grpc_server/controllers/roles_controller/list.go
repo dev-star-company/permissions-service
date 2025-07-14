@@ -15,8 +15,14 @@ import (
 )
 
 func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*roles_proto.ListResponse, error) {
+	tx, err := c.Db.Tx(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
 
-	rolesQ := c.Db.Role.Query()
+	rolesQ := tx.Role.Query().
+		Limit(int(*in.Limit)).
+		Offset(int(*in.Offset))
 
 	if in.IncludeDeleted != nil && *in.IncludeDeleted {
 		ctx = schema.SkipSoftDelete(ctx)
@@ -91,22 +97,26 @@ func (c *controller) List(ctx context.Context, in *roles_proto.ListRequest) (*ro
 
 	count, err := rolesQ.Count(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("querying users: %w", err)
+		return nil, fmt.Errorf("querying roles: %w", err)
 	}
 
 	roles, err := rolesQ.All(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("querying users: %w", err)
+		return nil, fmt.Errorf("querying roles: %w", err)
 	}
 
-	response := &roles_proto.ListResponse{
-		Rows:  make([]*roles_proto.Role, len(roles)),
+	responseRoles := make([]*roles_proto.Role, len(roles))
+	for i, user := range roles {
+		responseRoles[i] = grpc_convertions.RoleToProto(user)
+	}
+
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("committing transaction: %w", err)
+	}
+
+	return &roles_proto.ListResponse{
+		Rows:  responseRoles,
 		Count: uint32(count),
-	}
-
-	for i, role := range roles {
-		response.Rows[i] = grpc_convertions.RoleToProto(role)
-	}
-
-	return response, nil
+	}, nil
 }

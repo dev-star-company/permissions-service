@@ -73,7 +73,10 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 		return nil, err
 	}
 
-	// Create and return the response
+	if err := tx.Commit(); err != nil {
+		return nil, utils.Rollback(tx, err)
+	}
+
 	return &auth_users_proto.UpdateResponse{
 		User: grpc_convertions.UserToProto(user),
 	}, nil

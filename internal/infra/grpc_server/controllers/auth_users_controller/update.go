@@ -5,6 +5,7 @@ import (
 	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/password"
+	userSchema "permissions-service/internal/app/ent/user"
 	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
@@ -22,7 +23,6 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
-
 	defer tx.Rollback()
 
 	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
@@ -30,25 +30,18 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 		return nil, err
 	}
 
-	var userQ *ent.UserUpdateOne
-	if in.Id != nil {
-		userQ = tx.User.UpdateOneID(int(*in.Id))
-	} else if in.Uuid != nil {
-		u, err := controllers.GetUserFromUuid(tx, ctx, *in.Uuid)
-		if err != nil {
-			return nil, err
-		}
-		userQ = tx.User.UpdateOneID(u.ID)
-	} else {
-		return nil, errs.UserNotFound(0)
-	}
+	userQ := tx.User.UpdateOneID(int(*in.Id)).SetUpdatedBy(requester.ID)
 
 	if in.Name != nil {
 		userQ.SetName(*in.Name)
 	}
-
 	if in.Surname != nil {
 		userQ.SetSurname(*in.Surname)
+	}
+
+	user, err := userQ.Save(ctx)
+	if err != nil {
+		return nil, utils.Rollback(tx, err)
 	}
 
 	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
@@ -56,29 +49,38 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 			SetPassword(*in.Password).
 			SetCreatedBy(requester.ID).
 			SetUpdatedBy(requester.ID).
+			SetUserID(user.ID).
 			Save(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		np := tx.Password.Query().Where(password.IDNotIn(p.ID)).Order(ent.Asc(password.FieldID)).FirstX(ctx)
-		err = tx.Password.DeleteOneID(np.ID).Exec(ctx)
 		if err != nil {
 			return nil, utils.Rollback(tx, err)
 		}
-	}
 
-	user, err := userQ.SetUpdatedBy(requester.ID).Save(ctx)
-	if err != nil {
-		return nil, err
+		oldPassword := tx.Password.Query().
+			Where(password.IDNotIn(p.ID), password.HasUserWith(userSchema.IDEQ(user.ID))).
+			Order(ent.Desc(password.FieldID)).
+			FirstX(ctx)
+
+		err = tx.Password.DeleteOneID(oldPassword.ID).Exec(ctx)
+		if err != nil {
+			return nil, utils.Rollback(tx, err)
+		}
 	}
 
 	if err := tx.Commit(); err != nil {
 		return nil, utils.Rollback(tx, err)
 	}
 
-	return &auth_users_proto.UpdateResponse{
-		User: grpc_convertions.UserToProto(user),
-	}, nil
+	userWithRelations, err := c.Db.User.Query().
+		Where(userSchema.IDEQ(user.ID)).
+		WithPhones().
+		WithEmails().
+		WithRoles().
+		Only(ctx)
+	if err != nil {
+		return nil, err
+	}
 
+	return &auth_users_proto.UpdateResponse{
+		User: grpc_convertions.UserToProto(userWithRelations),
+	}, nil
 }

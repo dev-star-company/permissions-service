@@ -13,15 +13,8 @@ import (
 )
 
 func (c *controller) List(ctx context.Context, in *auth_users_proto.ListRequest) (*auth_users_proto.ListResponse, error) {
-	tx, err := c.Db.Tx(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("starting a transaction: %w", err)
-	}
 
-	// Get the user from the database
-	query := tx.User.Query().
-		Limit(int(in.Limit)).
-		Offset(int(in.Offset))
+	query := c.Db.User.Query()
 
 	if in.IncludeDeleted != nil && *in.IncludeDeleted {
 		ctx = schema.SkipSoftDelete(ctx)
@@ -52,10 +45,6 @@ func (c *controller) List(ctx context.Context, in *auth_users_proto.ListRequest)
 			query = query.WithPhones()
 		}
 
-		// if in.Relations.Passwords {
-		// 	query = query.WithPasswords()
-		// }
-
 		if in.Relations.Roles {
 			query = query.WithRoles()
 		}
@@ -64,6 +53,14 @@ func (c *controller) List(ctx context.Context, in *auth_users_proto.ListRequest)
 	count, err := query.Count(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("querying users: %w", err)
+	}
+
+	if in.Limit > 0 {
+		query = query.Limit(int(in.Limit))
+	}
+
+	if in.Offset > 0 {
+		query = query.Offset(int(in.Offset))
 	}
 
 	users, err := query.All(ctx)
@@ -75,12 +72,6 @@ func (c *controller) List(ctx context.Context, in *auth_users_proto.ListRequest)
 	responseUsers := make([]*auth_users_proto.User, len(users))
 	for i, user := range users {
 		responseUsers[i] = grpc_convertions.UserToProto(user)
-	}
-
-	// Commit the transaction
-	if err := tx.Commit(); err != nil {
-		tx.Rollback()
-		return nil, fmt.Errorf("committing transaction: %w", err)
 	}
 
 	// Create and return the response

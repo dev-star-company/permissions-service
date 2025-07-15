@@ -3,9 +3,6 @@ package auth_users_controller
 import (
 	"context"
 	"permissions-service/internal/adapters/grpc_convertions"
-	"permissions-service/internal/app/ent"
-	"permissions-service/internal/app/ent/password"
-	userSchema "permissions-service/internal/app/ent/user"
 	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
@@ -21,66 +18,36 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
-		return nil, errs.StartTransactionError(err)
+		return nil, err
 	}
-	defer tx.Rollback()
 
 	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	userQ := tx.User.UpdateOneID(int(*in.Id)).SetUpdatedBy(requester.ID)
+	query := tx.User.
+		UpdateOneID(int(*in.Id)).
+		SetUpdatedBy(requester.ID)
 
 	if in.Name != nil {
-		userQ.SetName(*in.Name)
-	}
-	if in.Surname != nil {
-		userQ.SetSurname(*in.Surname)
+		query.SetName(*in.Name)
 	}
 
-	user, err := userQ.Save(ctx)
+	if in.Surname != nil {
+		query.SetSurname(*in.Surname)
+	}
+
+	user, err := query.Save(ctx)
 	if err != nil {
 		return nil, utils.Rollback(tx, err)
-	}
-
-	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
-		p, err := tx.Password.Create().
-			SetPassword(*in.Password).
-			SetCreatedBy(requester.ID).
-			SetUpdatedBy(requester.ID).
-			SetUserID(user.ID).
-			Save(ctx)
-		if err != nil {
-			return nil, utils.Rollback(tx, err)
-		}
-
-		oldPassword := tx.Password.Query().
-			Where(password.IDNotIn(p.ID), password.HasUserWith(userSchema.IDEQ(user.ID))).
-			Order(ent.Desc(password.FieldID)).
-			FirstX(ctx)
-
-		err = tx.Password.DeleteOneID(oldPassword.ID).Exec(ctx)
-		if err != nil {
-			return nil, utils.Rollback(tx, err)
-		}
 	}
 
 	if err := tx.Commit(); err != nil {
 		return nil, utils.Rollback(tx, err)
 	}
 
-	userWithRelations, err := c.Db.User.Query().
-		Where(userSchema.IDEQ(user.ID)).
-		WithPhones().
-		WithEmails().
-		WithRoles().
-		Only(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	return &auth_users_proto.UpdateResponse{
-		User: grpc_convertions.UserToProto(userWithRelations),
+		User: grpc_convertions.UserToProto(user),
 	}, nil
 }

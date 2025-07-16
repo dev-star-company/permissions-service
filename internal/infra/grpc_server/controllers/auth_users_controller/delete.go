@@ -21,14 +21,11 @@ func (c *controller) Delete(ctx context.Context, in *auth_users_proto.DeleteRequ
 		return nil, errs.StartTransactionError(err)
 	}
 
-	defer tx.Rollback()
-
 	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
 	if err != nil {
 		return nil, err
 	}
 
-	// Delete the user from the database
 	err = tx.User.DeleteOneID(int(in.Id)).Exec(ctx)
 	if err != nil {
 		return nil, utils.Rollback(tx, fmt.Errorf("deleting user: %w", err))
@@ -38,12 +35,11 @@ func (c *controller) Delete(ctx context.Context, in *auth_users_proto.DeleteRequ
 	if err != nil {
 		return nil, utils.Rollback(tx, fmt.Errorf("deleting user: %w", err))
 	}
-	// Commit the transaction
+
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("committing transaction: %w", err)
 	}
 
-	// Create and return the response
 	return &auth_users_proto.DeleteResponse{}, nil
 }

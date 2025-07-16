@@ -3,9 +3,11 @@ package auth_users_controller
 import (
 	"context"
 	"permissions-service/internal/adapters/grpc_convertions"
+	"permissions-service/internal/app/ent"
 	userSchema "permissions-service/internal/app/ent/user"
 	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
+	"sync"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
 
@@ -22,19 +24,44 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 		return nil, errs.StartTransactionError(err)
 	}
 
-	rollback := true
-	defer func() {
-		if rollback {
-			_ = tx.Rollback()
+	var wg sync.WaitGroup
+	var requester *ent.User
+	var target *ent.User
+
+	errCh := make(chan error, 2)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		requester, err = controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
+		if err != nil {
+			errCh <- err
 		}
 	}()
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		target, err = controllers.GetUserFromUuid(tx, ctx, *in.Uuid)
+		if err != nil {
+			errCh <- err
+		}
+	}()
+
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case err := <-errCh:
 		return nil, err
+	case <-done:
+		// No errors, continue
 	}
 
-	userQ := tx.User.UpdateOneID(int(*in.Id)).SetUpdatedBy(requester.ID)
+	userQ := tx.User.UpdateOneID(int(target.ID)).SetUpdatedBy(requester.ID)
 
 	if in.Name != nil {
 		userQ.SetName(*in.Name)
@@ -73,7 +100,6 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 	if err := tx.Commit(); err != nil {
 		return nil, utils.Rollback(tx, err)
 	}
-	rollback = false
 
 	userWithRelations, err := c.Db.User.Query().
 		Where(userSchema.IDEQ(user.ID)).

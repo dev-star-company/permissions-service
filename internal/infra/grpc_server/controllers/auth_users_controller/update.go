@@ -3,8 +3,6 @@ package auth_users_controller
 import (
 	"context"
 	"permissions-service/internal/adapters/grpc_convertions"
-	"permissions-service/internal/app/ent"
-	"permissions-service/internal/app/ent/password"
 	userSchema "permissions-service/internal/app/ent/user"
 	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
@@ -50,27 +48,27 @@ func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequ
 		return nil, utils.Rollback(tx, err)
 	}
 
-	if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
-		p, err := tx.Password.Create().
-			SetPassword(*in.Password).
-			SetCreatedBy(requester.ID).
-			SetUpdatedBy(requester.ID).
-			SetUserID(user.ID).
-			Save(ctx)
-		if err != nil {
-			return nil, utils.Rollback(tx, err)
-		}
+	// if in.Password != nil && in.ConfirmPassword != nil && *in.Password == *in.ConfirmPassword {
+	// 	p, err := tx.Password.Create().
+	// 		SetPassword(*in.Password).
+	// 		SetCreatedBy(requester.ID).
+	// 		SetUpdatedBy(requester.ID).
+	// 		SetUserID(user.ID).
+	// 		Save(ctx)
+	// 	if err != nil {
+	// 		return nil, utils.Rollback(tx, err)
+	// 	}
 
-		oldPassword := tx.Password.Query().
-			Where(password.IDNotIn(p.ID), password.HasUserWith(userSchema.IDEQ(user.ID))).
-			Order(ent.Desc(password.FieldID)).
-			FirstX(ctx)
+	// 	oldPassword := tx.Password.Query().
+	// 		Where(password.IDNotIn(p.ID), password.HasUserWith(userSchema.IDEQ(user.ID))).
+	// 		Order(ent.Desc(password.FieldID)).
+	// 		FirstX(ctx)
 
-		err = tx.Password.DeleteOneID(oldPassword.ID).Exec(ctx)
-		if err != nil {
-			return nil, utils.Rollback(tx, err)
-		}
-	}
+	// 	err = tx.Password.DeleteOneID(oldPassword.ID).Exec(ctx)
+	// 	if err != nil {
+	// 		return nil, utils.Rollback(tx, err)
+	// 	}
+	// }
 
 	if err := tx.Commit(); err != nil {
 		return nil, utils.Rollback(tx, err)

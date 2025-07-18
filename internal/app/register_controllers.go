@@ -8,9 +8,9 @@ import (
 	"permissions-service/internal/infra/grpc_server/controllers/login_attempts_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/permission_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/role_has_permissions_controller"
-	"permissions-service/internal/infra/grpc_server/controllers/user_has_roles_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/roles_controller"
 	"permissions-service/internal/infra/grpc_server/controllers/service_controller"
+	"permissions-service/internal/infra/grpc_server/controllers/user_has_roles_controller"
 
 	"github.com/dev-star-company/kafka-go/connection"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
@@ -19,9 +19,9 @@ import (
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/permission_proto"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/role_has_permissions_proto"
-	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/user_has_roles_proto"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/service_proto"
+	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/user_has_roles_proto"
 
 	"google.golang.org/grpc"
 )

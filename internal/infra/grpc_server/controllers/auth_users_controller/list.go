@@ -55,12 +55,12 @@ func (c *controller) List(ctx context.Context, in *auth_users_proto.ListRequest)
 		return nil, fmt.Errorf("querying users: %w", err)
 	}
 
-	if in.Limit > 0 {
-		query = query.Limit(int(in.Limit))
+	if in.Limit != nil && *in.Limit > 0 {
+		query = query.Limit(int(*in.Limit))
 	}
 
-	if in.Offset > 0 {
-		query = query.Offset(int(in.Offset))
+	if in.Offset != nil && *in.Offset > 0 {
+		query = query.Offset(int(*in.Offset))
 	}
 
 	users, err := query.All(ctx)

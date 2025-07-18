@@ -19,10 +19,10 @@ github.com/dev-star-company/custom-validate v0.0.0-20250610193354-9fdb77405da0 h
 github.com/dev-star-company/custom-validate v0.0.0-20250610193354-9fdb77405da0/go.mod h1:71KLWEeZrjuq7kc4WWjBSHlZKUfUprzTTIp4VTdH5kU=
 github.com/dev-star-company/kafka-go v0.0.0-20250626144000-60b3e0a820fa h1:/he78MBJGl051tMp89sLGQskb8BT1yzO9oM+fL6z7LQ=
 github.com/dev-star-company/kafka-go v0.0.0-20250626144000-60b3e0a820fa/go.mod h1:G18pJcMn/fnue+GG2gsA2VT9TsNDqs2cg5xaKidQYs4=
-github.com/dev-star-company/protos-go v0.0.0-20250715134156-a89c51e38d21 h1:DsnnNh/yphpHbVFGsArz8ENtePCAS4jVGWtfCmgs/NI=
-github.com/dev-star-company/protos-go v0.0.0-20250715134156-a89c51e38d21/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
-github.com/dev-star-company/service-errors v0.0.0-20250712173320-b9bc9dc7cd54 h1:eKKN3lovaLWmIbmCVqai7bGShoIzzq/9RQKyTEj+FAo=
-github.com/dev-star-company/service-errors v0.0.0-20250712173320-b9bc9dc7cd54/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
+github.com/dev-star-company/protos-go v0.0.0-20250718134928-fd02644365df h1:kekA6WAXaAcRMzqgqqaZCg+TZSE4BYAklcV1rXDJ6DY=
+github.com/dev-star-company/protos-go v0.0.0-20250718134928-fd02644365df/go.mod h1:/cuOaEctdYUw0ZKeEfawFDqtiDTu6Dd99zYc5Ig6Yy4=
+github.com/dev-star-company/service-errors v0.0.0-20250718142618-8a881d213466 h1:8tjLRl6I6Gjs27ICfDE1xF2o80o7HbleKrsONvKbG+U=
+github.com/dev-star-company/service-errors v0.0.0-20250718142618-8a881d213466/go.mod h1:oRQf4tYndCOdjP1Gb5DhBzuZhpYVnIRt2AbJO0i++Wg=
 github.com/gabriel-vasile/mimetype v1.4.9 h1:5k+WDwEsD9eTLL8Tz3L0VnmVh9QxGjRmjBvAG7U/oYY=
 github.com/gabriel-vasile/mimetype v1.4.9/go.mod h1:WnSQhFKJuBlRyLiKohA/2DtIlPFAbguNaG7QCHcyGok=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=

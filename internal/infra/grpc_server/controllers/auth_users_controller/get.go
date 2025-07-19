@@ -43,3 +43,36 @@ func (c *controller) Get(ctx context.Context, in *auth_users_proto.GetRequest) (
 	}, nil
 
 }
+
+func GetRoleIDsByUserID(ctx context.Context, db *ent.Client, userID uint32) ([]uint32, error) {
+	u, err := db.User.
+		Query().
+		Where(user.IDEQ(int(userID))).
+		WithRoles().
+		Only(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	roleIDs := make([]uint32, 0, len(u.Edges.Roles))
+	for _, role := range u.Edges.Roles {
+		roleIDs = append(roleIDs, uint32(role.ID))
+	}
+
+	return roleIDs, nil
+}
+
+func (c *controller) GetUserRoles(ctx context.Context, req *auth_users_proto.GetUserByRolesRequest) (*auth_users_proto.GetUserByRolesResponse, error) {
+	userID := req.GetId()
+
+	roleIDs, err := GetRoleIDsByUserID(ctx, c.Db, userID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "erro ao buscar roles: %v", err)
+	}
+
+	return &auth_users_proto.GetUserByRolesResponse{
+		RolesIds:      roleIDs,
+		RequesterUuid: req.RequesterUuid,
+	}, nil
+}

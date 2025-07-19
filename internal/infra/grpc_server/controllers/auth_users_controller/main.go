@@ -13,6 +13,7 @@ type Controller interface {
 
 	Create(ctx context.Context, in *auth_users_proto.CreateRequest) (*auth_users_proto.CreateResponse, error)
 	Get(ctx context.Context, in *auth_users_proto.GetRequest) (*auth_users_proto.GetResponse, error)
+	GetUserRoles(ctx context.Context, in *auth_users_proto.GetUserByRolesRequest) (*auth_users_proto.GetUserByRolesResponse, error)
 	Update(ctx context.Context, in *auth_users_proto.UpdateRequest) (*auth_users_proto.UpdateResponse, error)
 	Delete(ctx context.Context, in *auth_users_proto.DeleteRequest) (*auth_users_proto.DeleteResponse, error)
 	List(ctx context.Context, in *auth_users_proto.ListRequest) (*auth_users_proto.ListResponse, error)

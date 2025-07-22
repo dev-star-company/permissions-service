@@ -13,13 +13,9 @@ func UserToProto(user *ent.User) *auth_users_proto.User {
 
 	u := auth_users_proto.User{
 		Id:        uint32(user.ID),
-		Uuid:      user.UUID.String(),
 		Surname:   user.Surname,
 		Name:      user.Name,
-		CreatedBy: uint32(user.CreatedBy),
-		UpdatedBy: uint32(user.UpdatedBy),
 		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 
 	if len(user.Edges.Emails) != 0 {
@@ -39,11 +35,6 @@ func UserToProto(user *ent.User) *auth_users_proto.User {
 	if user.DeletedAt != nil {
 		x := user.DeletedAt.Format("2006-01-02 15:04:05")
 		u.DeletedAt = &x
-	}
-
-	if user.DeletedBy != nil {
-		x := uint32(*user.DeletedBy)
-		u.DeletedBy = &x
 	}
 
 	return &u

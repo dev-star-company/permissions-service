@@ -16,9 +16,6 @@ func RoleToProto(role *ent.Role) *roles_proto.Role {
 		Name:        role.Name,
 		Description: role.Description,
 		CreatedAt:   role.CreatedAt.String(),
-		UpdatedAt:   role.UpdatedAt.String(),
-		CreatedBy:   uint32(role.CreatedBy),
-		UpdatedBy:   uint32(role.UpdatedBy),
 	}
 
 	if role.IsActive != nil {
@@ -29,11 +26,6 @@ func RoleToProto(role *ent.Role) *roles_proto.Role {
 	if role.DeletedAt != nil {
 		x := role.DeletedAt.Format("2006-01-02 15:04:05")
 		r.DeletedAt = &x
-	}
-
-	if role.DeletedBy != nil {
-		x := uint32(*role.DeletedBy)
-		r.DeletedBy = &x
 	}
 
 	return &r

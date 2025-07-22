@@ -8,7 +8,6 @@ import (
 	"permissions-service/internal/app/ent/email"
 	"permissions-service/internal/app/ent/phone"
 	"permissions-service/internal/config/env"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/kafka-go/actions"
@@ -25,7 +24,8 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 
 	defer tx.Rollback()
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
+	requester, err := tx.User.Get(ctx, in.RequesterId)
+
 	if err != nil {
 		return nil, err
 	}

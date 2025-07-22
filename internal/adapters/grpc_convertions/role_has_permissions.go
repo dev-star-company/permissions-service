@@ -15,19 +15,11 @@ func RoleHasPermissionsToProto(role_has_permissions *ent.RoleHasPermissions) *ro
 		RoleId:       uint32(role_has_permissions.RoleID),
 		PermissionId: uint32(role_has_permissions.PermissionID),
 		CreatedAt:    role_has_permissions.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:    role_has_permissions.UpdatedAt.Format("2006-01-02 15:04:05"),
-		CreatedBy:    uint32(role_has_permissions.CreatedBy),
-		UpdatedBy:    uint32(role_has_permissions.UpdatedBy),
 	}
 
 	if role_has_permissions.DeletedAt != nil {
 		x := role_has_permissions.DeletedAt.Format("2006-01-02 15:04:05")
 		e.DeletedAt = &x
-	}
-
-	if role_has_permissions.DeletedBy != nil {
-		x := uint32(*role_has_permissions.DeletedBy)
-		e.DeletedBy = &x
 	}
 
 	return &e

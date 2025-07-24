@@ -3,7 +3,6 @@ package first_login_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/first_login_proto"
@@ -17,22 +16,11 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
-	}
-
 	first_loginQ := tx.FirstLogin.UpdateOneID(int(in.Id))
 
-	if in.UserUuid != nil && *in.UserUuid != "" {
-		user, err := controllers.GetUserFromUuid(tx, ctx, *in.UserUuid)
-		if err != nil {
-			return nil, utils.Rollback(tx, err)
-		}
-		first_loginQ.SetUserID(user.ID)
+	if in.UserId != nil && *in.UserId > 0 {
+		first_loginQ.SetUserID(int(*in.UserId))
 	}
-
-	first_loginQ.SetUpdatedBy(requester.ID)
 
 	first_login, err := first_loginQ.Save(ctx)
 	if err != nil {
@@ -49,8 +37,12 @@ func (c *controller) Update(ctx context.Context, in *first_login_proto.UpdateReq
 		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
+	var userId int32
+	if first_login.UserID != nil {
+		userId = int32(*first_login.UserID)
+	}
+
 	return &first_login_proto.UpdateResponse{
-		RequesterUuid: in.RequesterUuid,
-		UserUuid:      first_login.Edges.User.UUID.String(),
+		UserId: userId,
 	}, nil
 }

@@ -26,6 +26,14 @@ func (c *controller) List(ctx context.Context, in *role_has_permissions_proto.Li
 
 	query := tx.RoleHasPermissions.Query()
 
+	if in.RoleId != nil && *in.RoleId > 0 {
+		query = query.Where(rolehaspermissions.RoleID(int(*in.RoleId)))
+	}
+
+	if in.PermissionId != nil && *in.PermissionId > 0 {
+		query = query.Where(rolehaspermissions.PermissionID(int(*in.PermissionId)))
+	}
+
 	count, err := query.Count(ctx)
 	if err != nil {
 		return nil, errs.ListingError("querying role_has_permissions", err)

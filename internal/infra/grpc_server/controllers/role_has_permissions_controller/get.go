@@ -21,6 +21,5 @@ func (c *controller) Get(ctx context.Context, in *role_has_permissions_proto.Get
 	}
 
 	return &role_has_permissions_proto.GetResponse{
-		RequesterUuid: in.RequesterUuid,
-	}, nil
+		}, nil
 }

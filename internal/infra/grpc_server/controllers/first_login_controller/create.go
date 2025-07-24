@@ -2,7 +2,6 @@ package first_login_controller
 
 import (
 	"context"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/first_login_proto"
@@ -18,20 +17,13 @@ func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateReq
 
 	defer tx.Rollback()
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := controllers.GetUserFromUuid(tx, ctx, in.UserUuid)
+	user, err := c.Db.User.Get(ctx, int(in.UserId))
 	if err != nil {
 		return nil, err
 	}
 
 	create, err := tx.FirstLogin.Create().
 		SetUserID(user.ID).
-		SetCreatedBy(requester.ID).
-		SetUpdatedBy(requester.ID).
 		Save(ctx)
 
 	if err != nil {
@@ -43,7 +35,6 @@ func (c *controller) Create(ctx context.Context, in *first_login_proto.CreateReq
 	}
 
 	return &first_login_proto.CreateResponse{
-		RequesterUuid: in.RequesterUuid,
-		UserUuid:      create.Edges.User.UUID.String(),
+		UserId: int32(create.Edges.User.ID),
 	}, nil
 }

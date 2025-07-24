@@ -2,7 +2,7 @@ package role_has_permissions_controller
 
 import (
 	"context"
-	"permissions-service/internal/infra/grpc_server/controllers"
+
 	"permissions-service/internal/pkg/utils"
 	"time"
 
@@ -17,14 +17,8 @@ func (c *controller) Delete(ctx context.Context, in *role_has_permissions_proto.
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
-	}
-
 	err = tx.RoleHasPermissions.UpdateOneID(int(in.Id)).
 		SetDeletedAt(time.Now()).
-		SetDeletedBy(requester.ID).
 		Exec(ctx)
 
 	if err != nil {

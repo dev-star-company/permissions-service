@@ -4,7 +4,6 @@ import (
 	"context"
 	"permissions-service/internal/adapters/grpc_convertions"
 	userSchema "permissions-service/internal/app/ent/user"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
@@ -13,30 +12,21 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *auth_users_proto.UpdateRequest) (*auth_users_proto.UpdateResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
-	}
-
-	if in.Uuid == nil {
+	if in.Id == nil || *in.Id == 0 {
 		return nil, errs.RequesterIDRequired()
 	}
 
-	target, err := controllers.GetUserFromUuid(tx, ctx, *in.Uuid)
+	target, err := c.Db.User.Get(ctx, int(*in.Id))
 	if err != nil {
 		return nil, err
 	}
 
-	userQ := tx.User.UpdateOneID(int(target.ID)).SetUpdatedBy(requester.ID)
+	userQ := tx.User.UpdateOneID(int(target.ID))
 
 	if in.Name != nil {
 		userQ.SetName(*in.Name)

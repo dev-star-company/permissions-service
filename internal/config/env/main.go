@@ -12,16 +12,14 @@ import (
 )
 
 var (
-	PG_HOST              string
-	PG_USER              string
-	PG_PASSWORD          string
-	PG_DBNAME            string
-	PG_SSLMODE           string
-	PG_PORT              int
-	PORT                 int
-	DEV_MODE             bool
-	KAFKA_BROKER_URL     string
-	KAFKA_CONSUMER_GROUP string
+	PG_HOST     string
+	PG_USER     string
+	PG_PASSWORD string
+	PG_DBNAME   string
+	PG_SSLMODE  string
+	PG_PORT     int
+	PORT        int
+	DEV_MODE    bool
 )
 
 var envFile map[string]string
@@ -51,8 +49,6 @@ func init() {
 	PG_PORT = EnvToInt("PG_PORT")
 	PORT = EnvToInt("PORT")
 	DEV_MODE = EnvToBool("DEV_MODE")
-	KAFKA_BROKER_URL = EnvToString("KAFKA_BROKER_URL")
-	KAFKA_CONSUMER_GROUP = EnvToString("KAFKA_CONSUMER_GROUP")
 }
 
 func init() {
@@ -69,7 +65,7 @@ func init() {
 }
 
 func ValidateEnv() error {
-	requiredVars := []string{"PG_HOST", "PG_USER", "PG_PASSWORD", "PG_DBNAME", "PG_PORT", "PG_SSLMODE", "PORT", "DEV_MODE", "KAFKA_BROKER_URL", "KAFKA_CONSUMER_GROUP"}
+	requiredVars := []string{"PG_HOST", "PG_USER", "PG_PASSWORD", "PG_DBNAME", "PG_PORT", "PG_SSLMODE", "PORT", "DEV_MODE"}
 	for _, key := range requiredVars {
 		if envFile[key] == "" {
 			return errors.New(key + " is not set in .env file")

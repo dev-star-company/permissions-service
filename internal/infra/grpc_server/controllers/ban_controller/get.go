@@ -23,6 +23,5 @@ func (c *controller) Get(ctx context.Context, in *ban_proto.GetRequest) (*ban_pr
 
 	return &ban_proto.GetResponse{
 		ExpiresAt: ban.ExpiresAt.String(),
-		UserUuid:  ban.Edges.User.UUID.String(),
 	}, nil
 }

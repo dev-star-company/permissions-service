@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // Phone holds the schema definition for the Phone entity.
@@ -21,7 +20,6 @@ type Phone struct {
 // Fields of the Phone.
 func (Phone) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("uuid", uuid.New()).Default(uuid.New).Unique(),
 		field.String("phone").NotEmpty(),
 		field.Int("user_id"),
 		field.Bool("main").Default(false),

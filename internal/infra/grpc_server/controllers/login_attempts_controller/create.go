@@ -2,7 +2,6 @@ package login_attempts_controller
 
 import (
 	"context"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/login_attempts_proto"
@@ -16,21 +15,8 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 		return nil, errs.StartTransactionError(err)
 	}
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := controllers.GetUserFromUuid(tx, ctx, in.UserUuid)
-	if err != nil {
-		return nil, err
-	}
-
-	create, err := c.Db.LoginAttempts.Create().
-		SetUserID(user.ID).
+	_, err = c.Db.LoginAttempts.Create().
 		SetSuccessful(in.Successful).
-		SetCreatedBy(requester.ID).
-		SetUpdatedBy(requester.ID).
 		Save(ctx)
 
 	if err != nil {
@@ -41,9 +27,5 @@ func (c *controller) Create(ctx context.Context, in *login_attempts_proto.Create
 		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
-	return &login_attempts_proto.CreateResponse{
-		RequesterUuid: in.RequesterUuid,
-		UserUuid:      user.UUID.String(),
-		Successful:    bool(create.Successful),
-	}, nil
+	return &login_attempts_proto.CreateResponse{}, nil
 }

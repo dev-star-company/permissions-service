@@ -20,7 +20,5 @@ func (c *controller) Get(ctx context.Context, in *user_has_roles_proto.GetReques
 		return nil, errs.UserHasRolesNotFound(int(in.Id))
 	}
 
-	return &user_has_roles_proto.GetResponse{
-		RequesterUuid: in.RequesterUuid,
-	}, nil
+	return &user_has_roles_proto.GetResponse{}, nil
 }

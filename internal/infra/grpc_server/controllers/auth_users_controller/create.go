@@ -4,14 +4,10 @@ import (
 	"context"
 	"fmt"
 	"permissions-service/internal/adapters/grpc_convertions"
-	"permissions-service/internal/adapters/kafka_dtos"
 	"permissions-service/internal/app/ent/email"
 	"permissions-service/internal/app/ent/phone"
-	"permissions-service/internal/config/env"
 	"permissions-service/internal/pkg/utils"
 
-	"github.com/dev-star-company/kafka-go/actions"
-	"github.com/dev-star-company/kafka-go/connection"
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
 	"github.com/dev-star-company/service-errors/errs"
 )
@@ -24,18 +20,10 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 
 	defer tx.Rollback()
 
-	requester, err := tx.User.Get(ctx, in.RequesterId)
-
-	if err != nil {
-		return nil, err
-	}
-
 	// Create a new user in the database
 	user, err := tx.User.Create().
 		SetName(in.Name).
 		SetSurname(in.Surname).
-		SetCreatedBy(requester.ID).
-		SetUpdatedBy(requester.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -52,8 +40,6 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	email, err := tx.Email.Create().
 		SetEmail(in.Email).
 		SetUserID(user.ID).
-		SetCreatedBy(user.ID).
-		SetUpdatedBy(user.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -62,8 +48,6 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	password, err := tx.Password.Create().
 		SetPassword(in.Password).
 		SetUserID(user.ID).
-		SetCreatedBy(user.ID).
-		SetUpdatedBy(user.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -80,8 +64,6 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	phone, err := tx.Phone.Create().
 		SetPhone(in.Phone).
 		SetUserID(user.ID).
-		SetCreatedBy(user.ID).
-		SetUpdatedBy(user.ID).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -90,16 +72,6 @@ func (c *controller) Create(ctx context.Context, in *auth_users_proto.CreateRequ
 	user.Edges.Emails = append(user.Edges.Emails, email)
 	user.Edges.Passwords = append(user.Edges.Passwords, password)
 	user.Edges.Phones = append(user.Edges.Phones, phone)
-
-	userToSync := connection.Message[connection.SyncUserStruct]{
-		Action:    actions.CREATE,
-		Payload:   kafka_dtos.ToKafkaUser(*user),
-		Publisher: env.KAFKA_CONSUMER_GROUP,
-	}
-	err = c.k.PublishToSyncUsers(userToSync)
-	if err != nil {
-		return nil, fmt.Errorf("publishing user to sync: %w", err)
-	}
 
 	// Commit the transaction
 	if err := tx.Commit(); err != nil {

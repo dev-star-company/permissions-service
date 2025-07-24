@@ -3,7 +3,6 @@ package auth_users_controller
 import (
 	"context"
 	"errors"
-	"fmt"
 	"permissions-service/internal/adapters/grpc_convertions"
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/email"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/auth_users_proto"
 	"github.com/dev-star-company/service-errors/errs"
-	"github.com/google/uuid"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,18 +23,14 @@ func (c *controller) VerifyPassword(ctx context.Context, in *auth_users_proto.Ve
 		return nil, errs.BadRequest(errors.New("password is required"))
 	}
 
-	if in.Uuid == nil && in.Email == nil && in.Phone == nil {
-		return nil, errs.BadRequest(errors.New("either uuid, email or phone is required"))
+	if in.Id == nil && in.Email == nil && in.Phone == nil {
+		return nil, errs.BadRequest(errors.New("either id, email or phone is required"))
 	}
 
 	userQ := c.Db.User.Query()
 
-	if in.Uuid != nil && *in.Uuid != "" {
-		uuidRequester, err := uuid.Parse(*in.Uuid)
-		if err != nil {
-			return nil, fmt.Errorf("invalid requester UUID: %w", err)
-		}
-		userQ = userQ.Where(user.UUIDEQ(uuidRequester))
+	if in.Id != nil && *in.Id != 0 {
+		userQ = userQ.Where(user.IDEQ(int(*in.Id)))
 	}
 
 	if in.Email != nil && *in.Email != "" {

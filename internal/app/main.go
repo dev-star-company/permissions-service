@@ -8,9 +8,7 @@ import (
 	"permissions-service/internal/app/ent"
 	_ "permissions-service/internal/app/ent/runtime"
 	"permissions-service/internal/config/env"
-	"permissions-service/internal/infra/kafka"
 
-	"github.com/dev-star-company/kafka-go/connection"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -42,12 +40,7 @@ func New(port int) {
 	)
 	grpcServer := grpc.NewServer(opts...)
 
-	//Connect to topics that service use
-	conn := connection.New(env.KAFKA_BROKER_URL, env.KAFKA_CONSUMER_GROUP)
-	k := kafka.New(client, conn)
-	go k.SyncUsers()
-
-	RegisterControllers(grpcServer, client, conn)
+	RegisterControllers(grpcServer, client)
 	reflection.Register(grpcServer)
 
 	fmt.Printf("Server is running on port:%d\n", port)

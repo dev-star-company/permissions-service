@@ -6,15 +6,9 @@ import (
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/roles_proto"
-
-	"github.com/dev-star-company/service-errors/errs"
 )
 
 func (c *controller) Delete(ctx context.Context, in *roles_proto.DeleteRequest) (*roles_proto.DeleteResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("starting a transaction: %w", err)

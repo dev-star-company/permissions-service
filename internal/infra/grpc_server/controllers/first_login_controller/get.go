@@ -21,7 +21,6 @@ func (c *controller) Get(ctx context.Context, in *first_login_proto.GetRequest) 
 	}
 
 	return &first_login_proto.GetResponse{
-		RequesterUuid: in.RequesterUuid,
-		UserUuid:      first_login.Edges.User.UUID.String(),
+		UserId: int32(*first_login.UserID),
 	}, nil
 }

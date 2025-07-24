@@ -7,7 +7,7 @@ import (
 	"permissions-service/internal/app/ent"
 	"permissions-service/internal/app/ent/firstlogin"
 	"permissions-service/internal/app/ent/schema"
-	"permissions-service/internal/infra/grpc_server/controllers"
+
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/first_login_proto"
@@ -27,12 +27,8 @@ func (c *controller) List(ctx context.Context, in *first_login_proto.ListRequest
 
 	query := tx.FirstLogin.Query()
 
-	if in.UserUuid != nil && *in.UserUuid != "" {
-		uuidUser, err := controllers.GetUserFromUuid(tx, ctx, *in.UserUuid)
-		if err != nil {
-			return nil, err
-		}
-		query = query.Where(firstlogin.UserID(uuidUser.ID))
+	if in.UserId != nil && *in.UserId > 0 {
+		query = query.Where(firstlogin.UserID(int(*in.UserId)))
 	}
 
 	count, err := query.Count(ctx)

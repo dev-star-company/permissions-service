@@ -2,8 +2,10 @@ package ban_controller
 
 import (
 	"context"
-	"permissions-service/internal/infra/grpc_server/controllers"
+	"fmt"
 	"permissions-service/internal/pkg/utils"
+	"strconv"
+	"time"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/ban_proto"
 
@@ -11,26 +13,20 @@ import (
 )
 
 func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*ban_proto.CreateResponse, error) {
-
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
 	}
-
 	defer tx.Rollback()
 
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
+	expiresAtInt, err := strconv.ParseInt(in.ExpiresAt, 10, 64)
 	if err != nil {
-		return nil, err
+		return nil, errs.BadRequest(fmt.Errorf("invalid expires_at: %w", err))
 	}
+	expiresAt := time.Unix(expiresAtInt, 0)
 
 	_, err = c.Db.Ban.Create().
-		SetCreatedBy(requester.ID).
-		SetUpdatedBy(requester.ID).
+		SetExpiresAt(expiresAt).
 		Save(ctx)
 
 	if err != nil {
@@ -41,7 +37,5 @@ func (c *controller) Create(ctx context.Context, in *ban_proto.CreateRequest) (*
 		return nil, utils.Rollback(tx, errs.CommitTransactionError(err))
 	}
 
-	return &ban_proto.CreateResponse{
-		RequesterUuid: in.RequesterUuid,
-	}, nil
+	return &ban_proto.CreateResponse{}, nil
 }

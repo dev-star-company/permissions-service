@@ -3,7 +3,6 @@ package service_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/service_proto"
@@ -12,18 +11,9 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest) (*service_proto.UpdateResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.RequesterIDRequired()
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
-	}
-
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
 	}
 
 	serviceQ := tx.Services.UpdateOneID(int(in.Id))
@@ -31,8 +21,6 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 	if in.Name != nil && *in.Name != "" {
 		serviceQ.SetName(string(*in.Name))
 	}
-
-	serviceQ.SetUpdatedBy(requester.ID)
 
 	service, err := serviceQ.Save(ctx)
 	if err != nil {
@@ -50,7 +38,6 @@ func (c *controller) Update(ctx context.Context, in *service_proto.UpdateRequest
 	}
 
 	return &service_proto.UpdateResponse{
-		RequesterUuid: in.RequesterUuid,
-		Name:          string(service.Name),
+		Name: string(service.Name),
 	}, nil
 }

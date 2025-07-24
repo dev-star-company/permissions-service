@@ -21,8 +21,7 @@ func (c *controller) Get(ctx context.Context, in *login_attempts_proto.GetReques
 	}
 
 	return &login_attempts_proto.GetResponse{
-		RequesterUuid: in.RequesterUuid,
-		UserUuid:      login_attempts.Edges.User.UUID.String(),
-		Successful:    bool(login_attempts.Successful),
+		UserId:     int32(login_attempts.UserID),
+		Successful: bool(login_attempts.Successful),
 	}, nil
 }

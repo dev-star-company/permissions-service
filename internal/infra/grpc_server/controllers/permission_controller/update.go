@@ -3,7 +3,6 @@ package permission_controller
 import (
 	"context"
 	"permissions-service/internal/app/ent"
-	"permissions-service/internal/infra/grpc_server/controllers"
 	"permissions-service/internal/pkg/utils"
 
 	"github.com/dev-star-company/protos-go/permissions_service/generated_protos/permission_proto"
@@ -12,18 +11,9 @@ import (
 )
 
 func (c *controller) Update(ctx context.Context, in *permission_proto.UpdateRequest) (*permission_proto.UpdateResponse, error) {
-	if in.RequesterUuid == "" {
-		return nil, errs.PermissionNotFound(int(in.Id))
-	}
-
 	tx, err := c.Db.Tx(ctx)
 	if err != nil {
 		return nil, errs.StartTransactionError(err)
-	}
-
-	requester, err := controllers.GetUserFromUuid(tx, ctx, in.RequesterUuid)
-	if err != nil {
-		return nil, err
 	}
 
 	permissionQ := tx.Permission.UpdateOneID(int(in.Id))
@@ -31,8 +21,6 @@ func (c *controller) Update(ctx context.Context, in *permission_proto.UpdateRequ
 	if in.Name != nil && *in.Name != "" {
 		permissionQ.SetName(string(*in.Name))
 	}
-
-	permissionQ.SetUpdatedBy(requester.ID)
 
 	permission, err := permissionQ.Save(ctx)
 	if err != nil {

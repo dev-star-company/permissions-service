@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 
@@ -25,11 +24,7 @@ type BaseMixin struct {
 func (BaseMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("created_at").Default(time.Now).Immutable(),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Time("deleted_at").Optional().Nillable(),
-		field.Int("created_by").Positive().Immutable(),
-		field.Int("updated_by").Positive(),
-		field.Int("deleted_by").Optional().Nillable(),
 	}
 }
 
@@ -51,30 +46,6 @@ func (d BaseMixin) Interceptors() []ent.Interceptor {
 			d.P(q)
 			return nil
 		}),
-	}
-}
-
-func (m BaseMixin) EdgesMixin(schemaName string) []ent.Edge {
-	switch schemaName {
-	case "Products":
-		return []ent.Edge{
-			edge.From("created_by_user", User.Type).
-				Ref("created_products").
-				Field("created_by").
-				Unique(),
-
-			edge.From("updated_by_user", User.Type).
-				Ref("updated_products").
-				Field("updated_by").
-				Unique(),
-
-			edge.From("deleted_by_user", User.Type).
-				Ref("deleted_products").
-				Field("deleted_by").
-				Unique(),
-		}
-	default:
-		return nil
 	}
 }
 
@@ -111,6 +82,6 @@ func (d BaseMixin) Hooks() []ent.Hook {
 // P adds a storage-level predicate to the queries and mutations.
 func (d BaseMixin) P(w interface{ WhereP(...func(*sql.Selector)) }) {
 	w.WhereP(
-		sql.FieldIsNull(d.Fields()[2].Descriptor().Name), // Assume it's deleted_at
+		sql.FieldIsNull(d.Fields()[1].Descriptor().Name), // deleted_at is now at index 1
 	)
 }
